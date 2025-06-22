@@ -14,7 +14,8 @@ app.use(cors({
 }));
 
 
-app.get('/flights', getFlights);
+// app.get('/flights', getFlights);
+app.post('/flights/search', getFlights);
 
 app.listen(PORT, () =>
     console.log(`Server is running on port: http://localhost:${PORT}`)

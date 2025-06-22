@@ -1,0 +1,25 @@
+POST http://localhost:3000/flights/search
+Content-Type: application/json
+
+{
+    "originCode": "REC",
+    "destinationCode": "SAO",
+    "dateOfDeparture": "2025-07-10",
+    "currency": "BRL",
+    "adults": 2,
+    "children": 1,
+    "infants": 0,
+    "max": 7
+}
+
+###
+
+POST http://localhost:3000/flights/search
+Content-Type: application/json
+
+{
+    "destinationCode": "SAO",
+    "originCode": "REC",
+    "dateOfDeparture": "2025-07-10",
+    "adults": 1
+}
