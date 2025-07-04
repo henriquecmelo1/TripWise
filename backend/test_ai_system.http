@@ -1,0 +1,247 @@
+# Arquivo de teste para o Sistema de IA do TripWise
+# Use estes comandos para testar as funcionalidades implementadas
+
+### 1. Health Check do Sistema
+GET http://localhost:3000/api/ai/health
+
+###
+
+### 2. Obter Questionário de Integração
+GET http://localhost:3000/api/ai/onboarding/questions
+
+###
+
+### 3. Criar Perfil de Usuário
+POST http://localhost:3000/api/ai/profile/create
+Content-Type: application/json
+
+{
+    "userId": "user_teste_123",
+    "onboardingData": {
+        "age": 28,
+        "location": "São Paulo, Brasil",
+        "preferredActivities": ["culinaria", "museus", "caminhadas", "fotografia"],
+        "budget": "moderado",
+        "accommodationType": "hotel_medio",
+        "planningStyle": "flexivel",
+        "typicalGroupSize": 2,
+        "typicalTripDuration": "7",
+        "pacePreference": "moderate",
+        "foodRestrictions": ["nenhuma"],
+        "transportPreference": ["aviao", "carro_alugado", "caminhada"],
+        "flexibilityLevel": "4",
+        "socialInteractionLevel": "moderate"
+    }
+}
+
+###
+
+### 4. Verificar Perfil Criado
+GET http://localhost:3000/api/ai/profile/user_teste_123
+
+###
+
+### 5. Gerar Itinerário Hiper-Personalizado
+POST http://localhost:3000/api/ai/itinerary/generate
+Content-Type: application/json
+
+{
+    "userId": "user_teste_123",
+    "tripDetails": {
+        "destination": "Lisboa, Portugal",
+        "duration": 5,
+        "startDate": "2025-08-15",
+        "endDate": "2025-08-20",
+        "travelers": 2,
+        "tripType": "lazer"
+    },
+    "realTimeData": {
+        "weather": "Ensolarado, 25°C, baixa probabilidade de chuva",
+        "events": "Festival de Fado no Alfama (16-18 agosto)"
+    }
+}
+
+###
+
+### 6. Iniciar Conversa com Copiloto Conversacional
+POST http://localhost:3000/api/ai/chat
+Content-Type: application/json
+
+{
+    "sessionId": "session_teste_001",
+    "message": "Olá! Acabei de receber meu itinerário para Lisboa. Gostei muito, mas queria saber se é possível incluir mais experiências gastronômicas locais.",
+    "userId": "user_teste_123",
+    "context": {
+        "currentLocation": "São Paulo",
+        "travelPhase": "planejamento",
+        "hasActiveItinerary": true
+    }
+}
+
+###
+
+### 7. Continuar Conversa - Modificação de Itinerário
+POST http://localhost:3000/api/ai/chat
+Content-Type: application/json
+
+{
+    "sessionId": "session_teste_001",
+    "message": "No dia 3, em vez de visitar o Museu do Azulejo, gostaria de fazer um tour gastronômico pelo Mercado da Ribeira. É possível?",
+    "userId": "user_teste_123",
+    "context": {
+        "currentLocation": "São Paulo",
+        "travelPhase": "planejamento",
+        "hasActiveItinerary": true,
+        "currentItinerary": {
+            "day": 3,
+            "originalActivity": "Museu do Azulejo"
+        }
+    }
+}
+
+###
+
+### 8. Solicitar Recomendações Contextuais
+POST http://localhost:3000/api/ai/recommendations/contextual
+Content-Type: application/json
+
+{
+    "userId": "user_teste_123",
+    "context": {
+        "situation": "Estou em Lisboa, é 14h de uma terça-feira, e acabei de almoçar no Chiado. Tenho 3 horas livres antes do próximo compromisso.",
+        "currentLocation": "Chiado, Lisboa",
+        "currentTime": "14:00",
+        "conditions": "Dia ensolarado, temperatura agradável"
+    }
+}
+
+###
+
+### 9. Otimizar Itinerário Baseado em Feedback
+POST http://localhost:3000/api/ai/itinerary/optimize
+Content-Type: application/json
+
+{
+    "userId": "user_teste_123",
+    "currentItinerary": {
+        "dia": 2,
+        "tema": "Descobrindo o Coração Histórico",
+        "atividades": [
+            {
+                "horario": "09:00",
+                "atividade": "Castelo de São Jorge",
+                "duracao": "2h30"
+            },
+            {
+                "horario": "12:00",
+                "atividade": "Almoço no Alfama",
+                "duracao": "1h30"
+            }
+        ]
+    },
+    "feedback": "O Castelo de São Jorge está muito cheio de turistas. Prefiro algo mais autêntico e com menos multidão, mas que ainda mostre a história de Lisboa.",
+    "constraints": {
+        "budget": "manter_atual",
+        "time": "manter_horarios",
+        "theme": "manter_historico"
+    }
+}
+
+###
+
+### 10. Analisar Padrões Comportamentais
+GET http://localhost:3000/api/ai/patterns/user_teste_123
+
+###
+
+### 11. Exemplo de Conversa Durante a Viagem
+POST http://localhost:3000/api/ai/chat
+Content-Type: application/json
+
+{
+    "sessionId": "session_lisboa_001",
+    "message": "Estou agora no Rossio e está começando a chover. O que você recomenda fazer por perto que seja coberto?",
+    "userId": "user_teste_123",
+    "context": {
+        "currentLocation": "Rossio, Lisboa",
+        "travelPhase": "durante_viagem",
+        "currentTime": "15:30",
+        "conditions": "Chuva leve começando"
+    }
+}
+
+###
+
+### 12. Pergunta Sobre Informações Específicas
+POST http://localhost:3000/api/ai/chat
+Content-Type: application/json
+
+{
+    "sessionId": "session_lisboa_001",
+    "message": "Qual é o melhor horário para visitar a Torre de Belém para evitar filas?",
+    "userId": "user_teste_123",
+    "context": {
+        "currentLocation": "Lisboa",
+        "travelPhase": "planejamento"
+    }
+}
+
+###
+
+### 13. Teste com Novo Usuário - Perfil Diferente
+POST http://localhost:3000/api/ai/profile/create
+Content-Type: application/json
+
+{
+    "userId": "aventureiro_456",
+    "onboardingData": {
+        "age": 35,
+        "location": "Rio de Janeiro, Brasil",
+        "preferredActivities": ["trilhas", "aventura", "natureza", "esportes", "fotografia"],
+        "budget": "economico",
+        "accommodationType": "hostel",
+        "planningStyle": "espontaneo",
+        "typicalGroupSize": 1,
+        "typicalTripDuration": "14",
+        "pacePreference": "active",
+        "foodRestrictions": ["vegetariano"],
+        "transportPreference": ["mochila", "transporte_publico", "bicicleta"],
+        "flexibilityLevel": "5"
+    }
+}
+
+###
+
+### 14. Itinerário para Perfil Aventureiro
+POST http://localhost:3000/api/ai/itinerary/generate
+Content-Type: application/json
+
+{
+    "userId": "aventureiro_456",
+    "tripDetails": {
+        "destination": "Sintra, Portugal",
+        "duration": 3,
+        "startDate": "2025-09-10",
+        "endDate": "2025-09-13",
+        "travelers": 1,
+        "tripType": "aventura"
+    },
+    "realTimeData": {
+        "weather": "Parcialmente nublado, 22°C, vento moderado",
+        "events": "Temporada baixa, menos turistas"
+    }
+}
+
+###
+
+### 15. Conversa Casual sobre Viagens
+POST http://localhost:3000/api/ai/chat
+Content-Type: application/json
+
+{
+    "sessionId": "session_casual_001",
+    "message": "Estou pensando em planejar uma viagem para o próximo ano, mas ainda não sei para onde. Você tem alguma sugestão?",
+    "userId": "user_teste_123"
+}
+
+###
