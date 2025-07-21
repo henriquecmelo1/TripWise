@@ -23,10 +23,8 @@ app.use((req, res, next) => {
 // Rotas existentes
 // app.post("/flights/search", getFlights);
 
-// Rotas da IA - Seção 4: Hiper-Personalização e Copiloto Conversacional
 app.use("/api/ai", aiRoutes);
 
-// Rota de boas-vindas com informações sobre a IA
 app.get("/", (req, res) => {
   res.json({
     message: "TripWise API - Sistema de Planejamento de Viagens com IA",

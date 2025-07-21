@@ -1,9 +1,8 @@
 import express from "express";
-import AIController from "../ai/ai.controller.js";
+import AIController from "../controllers/ai.controller.js";
 
 const router = express.Router();
 const aiController = new AIController();
-
 
 router.post("/itinerary/generate", async (req, res) => {
   await aiController.generateHyperPersonalizedItinerary(req, res);
@@ -35,6 +34,18 @@ router.get("/patterns/:userId", async (req, res) => {
 
 router.get("/health", async (req, res) => {
   await aiController.healthCheck(req, res);
+});
+
+router.post("/predictions/pricing", async (req, res) => {
+  await aiController.predictOptimalBookingTime(req, res);
+});
+
+router.post("/predictions/crowds", async (req, res) => {
+  await aiController.predictCrowdLevels(req, res);
+});
+
+router.post("/emergency/support", async (req, res) => {
+  await aiController.handleEmergencySupport(req, res);
 });
 
 router.get("/onboarding/questions", (req, res) => {
@@ -158,6 +169,8 @@ router.get("/onboarding/questions", (req, res) => {
         { value: "sem_lactose", label: "Sem lactose" },
         { value: "halal", label: "Halal" },
         { value: "kosher", label: "Kosher" },
+        { value: "hindu", label: "Hindu/Jainista" },
+        { value: "budista", label: "Budista" },
         {
           value: "alergias",
           label: "Alergias específicas (especificar depois)",
@@ -193,6 +206,66 @@ router.get("/onboarding/questions", (req, res) => {
           "Moderadamente flexível",
           "Muito flexível",
           "Totalmente flexível",
+        ],
+      },
+    },
+    {
+      id: "sustainability_importance",
+      type: "scale",
+      question: "Qual a importância da sustentabilidade em suas viagens?",
+      scale: {
+        min: 1,
+        max: 5,
+        labels: [
+          "Não é importante",
+          "Pouco importante",
+          "Moderadamente importante",
+          "Muito importante",
+          "Extremamente importante",
+        ],
+      },
+    },
+    {
+      id: "authentic_experiences",
+      type: "multiple_choice",
+      question: "Que tipo de experiências autênticas mais te atrai?",
+      options: [
+        {
+          value: "locais_escondidos",
+          label: "Locais escondidos e menos conhecidos",
+        },
+        {
+          value: "interacao_locais",
+          label: "Interação genuína com moradores locais",
+        },
+        {
+          value: "tradicoes_culturais",
+          label: "Tradições e festivais culturais",
+        },
+        {
+          value: "artesanato_local",
+          label: "Artesanato e produtos locais únicos",
+        },
+        {
+          value: "culinaria_tradicional",
+          label: "Culinária tradicional e familiar",
+        },
+        { value: "historia_oral", label: "História oral e narrativas locais" },
+      ],
+    },
+    {
+      id: "technology_comfort",
+      type: "scale",
+      question: "Quão confortável você é com tecnologia durante viagens?",
+      scale: {
+        min: 1,
+        max: 5,
+        labels: [
+          "Prefiro métodos tradicionais",
+          "Uso básico de tecnologia",
+          "Confortável com apps essenciais",
+          "Usuário avançado de tecnologia",
+          "Early adopter - adoro novidades",
         ],
       },
     },

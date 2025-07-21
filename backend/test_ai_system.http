@@ -245,3 +245,25 @@ Content-Type: application/json
 }
 
 ###
+
+### 16. Teste Específico de Recomendações de Hotéis
+POST http://localhost:3000/api/ai/itinerary/generate
+Content-Type: application/json
+
+{
+    "userId": "user_teste_123",
+    "tripDetails": {
+        "destination": "Porto, Portugal",
+        "duration": 4,
+        "startDate": "2025-10-15",
+        "endDate": "2025-10-19",
+        "travelers": 2,
+        "tripType": "romantico"
+    },
+    "realTimeData": {
+        "weather": "Outono ameno, 18-20°C",
+        "preferences": "Hotéis boutique, experiências locais"
+    }
+}
+
+###

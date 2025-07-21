@@ -191,7 +191,6 @@ class AIController {
     }
   }
 
-
   async getContextualRecommendations(req, res) {
     try {
       const { userId, context } = req.body;
@@ -367,6 +366,127 @@ class AIController {
       res.status(500).json({
         success: false,
         error: "Erro interno na análise",
+      });
+    }
+  }
+
+  /**
+   * Previsão de Preços Inteligente
+   */
+  async predictOptimalBookingTime(req, res) {
+    try {
+      const { tripDetails, preferences } = req.body;
+
+      if (!tripDetails) {
+        return res.status(400).json({
+          success: false,
+          error: "Detalhes da viagem são obrigatórios",
+        });
+      }
+
+      const prediction = await this.aiEngine.predictOptimalBookingTime(
+        tripDetails,
+        preferences
+      );
+
+      if (!prediction.success) {
+        return res.status(500).json(prediction);
+      }
+
+      res.json({
+        success: true,
+        predictions: prediction.predictions,
+        insights: "Análise baseada em dados históricos e tendências de mercado",
+        generatedAt: prediction.generatedAt,
+      });
+    } catch (error) {
+      console.error("Erro na previsão de preços:", error);
+      res.status(500).json({
+        success: false,
+        error: "Erro interno na análise preditiva",
+      });
+    }
+  }
+
+  /**
+   * Previsão de Multidões
+   */
+  async predictCrowdLevels(req, res) {
+    try {
+      const { destinations, timeframe } = req.body;
+
+      if (!destinations || !timeframe) {
+        return res.status(400).json({
+          success: false,
+          error: "Destinos e período são obrigatórios",
+        });
+      }
+
+      const prediction = await this.aiEngine.predictCrowdLevels(
+        destinations,
+        timeframe
+      );
+
+      if (!prediction.success) {
+        return res.status(500).json(prediction);
+      }
+
+      res.json({
+        success: true,
+        crowdData: prediction.crowdPredictions,
+        insights: "Previsões baseadas em padrões históricos de visitação",
+        generatedAt: prediction.generatedAt,
+      });
+    } catch (error) {
+      console.error("Erro na previsão de multidões:", error);
+      res.status(500).json({
+        success: false,
+        error: "Erro interno na análise de multidões",
+      });
+    }
+  }
+
+  /**
+   * Gestão Proativa de Perturbações
+   */
+  async handleEmergencySupport(req, res) {
+    try {
+      const { disruption, currentItinerary, userId } = req.body;
+
+      if (!disruption || !currentItinerary) {
+        return res.status(400).json({
+          success: false,
+          error:
+            "Informações sobre a perturbação e itinerário são obrigatórias",
+        });
+      }
+
+      // Obtém perfil do usuário para personalizar a solução
+      const profileResult = this.personalization.getUserProfile(userId);
+      const userProfile = profileResult.success ? profileResult.profile : {};
+
+      const solution = await this.aiEngine.handleTravelDisruption(
+        disruption,
+        currentItinerary,
+        userProfile
+      );
+
+      if (!solution.success) {
+        return res.status(500).json(solution);
+      }
+
+      res.json({
+        success: true,
+        emergencyResponse: solution.solutions,
+        disruption: solution.disruption,
+        priority: "ALTA - Resposta imediata",
+        resolvedAt: solution.resolvedAt,
+      });
+    } catch (error) {
+      console.error("Erro na gestão de emergência:", error);
+      res.status(500).json({
+        success: false,
+        error: "Erro interno na gestão de emergências",
       });
     }
   }
