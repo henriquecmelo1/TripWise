@@ -1,4 +1,16 @@
 import "dotenv/config";
+import {
+  API_BASE_URLS,
+  FOURSQUARE_CATEGORIES,
+  API_LIMITS,
+  API_VERSIONS,
+  CURRENCY_SYMBOLS,
+  RESTAURANT_PRICE_RANGES,
+  HOTEL_PRICE_RANGES,
+  HOTEL_TYPES,
+  ERROR_MESSAGES,
+  DEFAULT_CURRENCIES,
+} from "../constants/externalAPIs.constants.js";
 
 class ExternalAPIsService {
   constructor() {
@@ -20,11 +32,9 @@ class ExternalAPIsService {
       if (!this.isWeatherForecastAvailable(dates)) {
         return {
           success: false,
-          error: "Previsão meteorológica não disponível para datas distantes",
-          message:
-            "Dados meteorológicos só são confiáveis para viagens até 5 dias no futuro",
-          fallback:
-            "Consulte dados históricos do clima ou planeje roupas para todas as estações",
+          error: ERROR_MESSAGES.WEATHER_NOT_AVAILABLE,
+          message: ERROR_MESSAGES.WEATHER_RELIABILITY,
+          fallback: ERROR_MESSAGES.WEATHER_FALLBACK,
           canProvideHistoricalData: true,
         };
       }
@@ -44,7 +54,7 @@ class ExternalAPIsService {
       return {
         success: false,
         error: "Dados meteorológicos não disponíveis",
-        fallback: "Consulte a previsão local antes de viajar",
+        fallback: ERROR_MESSAGES.WEATHER_TRAVEL_ADVICE,
       };
     }
   }
@@ -56,7 +66,7 @@ class ExternalAPIsService {
 
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(
+        `${API_BASE_URLS.OPENWEATHER}/forecast?q=${encodeURIComponent(
           destination
         )}&appid=${this.apis.weather.openWeather}&units=metric&lang=pt_br`
       );
@@ -119,7 +129,7 @@ class ExternalAPIsService {
       return {
         success: false,
         error: "Dados de restaurantes não disponíveis",
-        fallback: "Consulte avaliações locais",
+        fallback: ERROR_MESSAGES.RESTAURANT_FALLBACK,
       };
     }
   }
@@ -143,7 +153,7 @@ class ExternalAPIsService {
       return {
         success: false,
         error: "Dados de hotéis não disponíveis",
-        fallback: "Consulte Booking.com ou Airbnb",
+        fallback: ERROR_MESSAGES.HOTEL_FALLBACK,
       };
     }
   }
@@ -154,20 +164,22 @@ class ExternalAPIsService {
     }
 
     const categoryMap = {
-      restaurant: "4d4b7105d754a06374d81259",
-      attraction: "5109983191d435c0d71c2bb1",
-      hotel: "4bf58dd8d48988d1fa931735",
+      restaurant: FOURSQUARE_CATEGORIES.RESTAURANT,
+      attraction: FOURSQUARE_CATEGORIES.ATTRACTION,
+      hotel: FOURSQUARE_CATEGORIES.HOTEL,
     };
 
     try {
       const response = await fetch(
-        `https://places-api.foursquare.com/places/search?near=${encodeURIComponent(
+        `${API_BASE_URLS.FOURSQUARE}/places/search?near=${encodeURIComponent(
           location
-        )}&fsq_category_ids=${categoryMap[category]}&limit=20`,
+        )}&fsq_category_ids=${categoryMap[category]}&limit=${
+          API_LIMITS.FOURSQUARE_SEARCH_LIMIT
+        }`,
         {
           headers: {
             accept: "application/json",
-            "X-Places-Api-Version": "2025-06-17",
+            "X-Places-Api-Version": API_VERSIONS.FOURSQUARE_PLACES,
             authorization: `Bearer ${this.apis.places.foursquare}`,
           },
         }
@@ -216,8 +228,8 @@ class ExternalAPIsService {
   }
 
   async getExchangeRates(
-    baseCurrency = "BRL",
-    targetCurrencies = ["USD", "EUR"]
+    baseCurrency = DEFAULT_CURRENCIES.BASE,
+    targetCurrencies = DEFAULT_CURRENCIES.TARGETS
   ) {
     try {
       if (!this.apis.exchange.exchangeRate) {
@@ -225,7 +237,7 @@ class ExternalAPIsService {
       }
 
       const response = await fetch(
-        `https://v6.exchangerate-api.com/v6/${this.apis.exchange.exchangeRate}/latest/${baseCurrency}`
+        `${API_BASE_URLS.EXCHANGE_RATE}/${this.apis.exchange.exchangeRate}/latest/${baseCurrency}`
       );
 
       if (!response.ok) {
@@ -269,7 +281,7 @@ class ExternalAPIsService {
       return {
         success: false,
         error: "Dados de câmbio não disponíveis",
-        fallback: "Consulte XE.com para taxas atuais",
+        fallback: ERROR_MESSAGES.EXCHANGE_FALLBACK,
         details: error.message,
       };
     }
@@ -283,14 +295,16 @@ class ExternalAPIsService {
     const travelDate = new Date(dates.startDate || dates.departureDate);
     const currentDate = new Date();
     const maxForecastDate = new Date();
-    maxForecastDate.setDate(currentDate.getDate() + 5);
+    maxForecastDate.setDate(
+      currentDate.getDate() + API_LIMITS.WEATHER_FORECAST_DAYS
+    );
 
     return travelDate <= maxForecastDate && travelDate >= currentDate;
   }
 
   getValidForecastDate() {
     const maxDate = new Date();
-    maxDate.setDate(maxDate.getDate() + 5);
+    maxDate.setDate(maxDate.getDate() + API_LIMITS.WEATHER_FORECAST_DAYS);
     return maxDate.toLocaleDateString("pt-BR");
   }
 
@@ -317,15 +331,10 @@ class ExternalAPIsService {
   processRestaurantData(rawData) {
     return rawData
       .filter((restaurant) => {
-        return (
-          restaurant.name &&
-          restaurant.name !== "Nome não disponível" &&
-          restaurant.rating &&
-          restaurant.rating > 4.0
-        );
+        return restaurant.name && restaurant.name !== "Nome não disponível";
       })
       .sort((a, b) => b.rating - a.rating)
-      .slice(0, 10)
+      .slice(0, API_LIMITS.RESTAURANT_RESULTS_LIMIT)
       .map((restaurant) => ({
         ...restaurant,
         priceRange: this.interpretPriceLevel(restaurant.price),
@@ -336,15 +345,10 @@ class ExternalAPIsService {
   processHotelData(rawData) {
     return rawData
       .filter((hotel) => {
-        return (
-          hotel.name &&
-          hotel.name !== "Nome não disponível" &&
-          hotel.rating &&
-          hotel.rating > 3.5
-        );
+        return hotel.name && hotel.name !== "Nome não disponível";
       })
       .sort((a, b) => b.rating - a.rating)
-      .slice(0, 8)
+      .slice(0, API_LIMITS.HOTEL_RESULTS_LIMIT)
       .map((hotel) => ({
         ...hotel,
         priceRange: this.interpretHotelPriceLevel(hotel.price),
@@ -356,36 +360,17 @@ class ExternalAPIsService {
   interpretPriceLevel(price) {
     if (!price || price === null) return "Preço não informado";
 
-    const priceMap = {
-      1: "Econômico ($ - até R$ 30)",
-      2: "Moderado ($$ - R$ 30-60)",
-      3: "Caro ($$$ - R$ 60-120)",
-      4: "Muito Caro ($$$$ - acima de R$ 120)",
-    };
-    return priceMap[price] || "Preço não informado";
+    return RESTAURANT_PRICE_RANGES[price] || "Preço não informado";
   }
 
   interpretHotelPriceLevel(price) {
     if (!price || price === null) return "Preço não informado";
 
-    const priceMap = {
-      1: "Econômico ($ - até R$ 150/noite)",
-      2: "Moderado ($$ - R$ 150-300/noite)",
-      3: "Caro ($$$ - R$ 300-600/noite)",
-      4: "Luxo ($$$$ - acima de R$ 600/noite)",
-    };
-    return priceMap[price] || "Preço não informado";
+    return HOTEL_PRICE_RANGES[price] || "Preço não informado";
   }
 
   getCurrencySymbol(currency) {
-    const symbols = {
-      USD: "$",
-      EUR: "€",
-      GBP: "£",
-      JPY: "¥",
-      BRL: "R$",
-    };
-    return symbols[currency] || currency;
+    return CURRENCY_SYMBOLS[currency] || currency;
   }
 
   getRecommendationReason(restaurant) {
@@ -410,19 +395,19 @@ class ExternalAPIsService {
 
   categorizeHotelType(categories) {
     if (!categories || !Array.isArray(categories) || categories.length === 0) {
-      return "Hotel Padrão";
+      return HOTEL_TYPES.STANDARD;
     }
 
     const categoryNames = categories.map((cat) => cat.toLowerCase()).join(" ");
 
     if (categoryNames.includes("luxury") || categoryNames.includes("resort"))
-      return "Luxo/Resort";
-    if (categoryNames.includes("boutique")) return "Boutique";
-    if (categoryNames.includes("business")) return "Executivo";
-    if (categoryNames.includes("historic")) return "Histórico";
-    if (categoryNames.includes("hostel")) return "Hostel";
+      return HOTEL_TYPES.LUXURY_RESORT;
+    if (categoryNames.includes("boutique")) return HOTEL_TYPES.BOUTIQUE;
+    if (categoryNames.includes("business")) return HOTEL_TYPES.BUSINESS;
+    if (categoryNames.includes("historic")) return HOTEL_TYPES.HISTORIC;
+    if (categoryNames.includes("hostel")) return HOTEL_TYPES.HOSTEL;
 
-    return "Hotel Padrão";
+    return HOTEL_TYPES.STANDARD;
   }
 }
 
