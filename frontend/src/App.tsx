@@ -1,10 +1,11 @@
 import './App.css'
-import Questionnaire from './pages/Questionnaire'
+import FlightSelection from './pages/FlightSelection'
+// import Questionnaire from './pages/Questionnaire'
 
 function App() {
 
   return (
-    <Questionnaire />
+    <FlightSelection />
   )
 }
 
