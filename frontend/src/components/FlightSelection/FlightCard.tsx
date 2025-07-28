@@ -1,5 +1,4 @@
 // src/components/FlightSelection/FlightCard.tsx
-import React from 'react';
 import type { Flight } from '../../data/mockFlights'; // Importa a interface Flight
  // Importa a interface Flight
 
@@ -10,7 +9,7 @@ interface FlightCardProps {
   clockIcon: string;
 }
 
-export default function FlightCard({ flight, planeIcon, clockIcon }: FlightCardProps) {
+export default function FlightCard({ flight, clockIcon }: FlightCardProps) {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   };

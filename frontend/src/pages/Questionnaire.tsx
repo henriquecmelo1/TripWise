@@ -13,6 +13,7 @@ import {
   transportationOptions,
   vibeOptions,
 } from "../data/questionnaireOptions"; // Ajuste o caminho se sua pasta 'data' estiver em outro lugar
+import { Link } from "react-router-dom";
 
 // Opcional: Se você instalou react-icons, pode importar aqui
 // import { FaMapMarkerAlt, FaClock, FaUsers, FaDollarSign, FaUserFriends, FaCarSide, FaCloudSun } from 'react-icons/fa';
@@ -207,9 +208,9 @@ export default function Questionnaire() {
           onChange={setVibe}
         />
 
-        <button
+        <Link
+          to="/flights"
           type="submit"
-          disabled={isLoading}
           className={`w-full py-4 px-6 rounded-lg text-white text-xl font-bold
                       bg-gradient-to-r from-primary to-accent
                       hover:opacity-90 transition-all duration-300
@@ -222,7 +223,7 @@ export default function Questionnaire() {
               🚀
             </span>
           )}
-        </button>
+        </Link>
 
         {error && (
           <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">

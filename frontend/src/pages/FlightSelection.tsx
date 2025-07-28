@@ -1,5 +1,5 @@
 // src/pages/FlightSelection.tsx (NOVA PÁGINA)
-import React, { useState } from "react";
+import { useState } from "react";
 import FlightCard from "../components/FlightSelection/FlightCard";
 import {
   type Flight,
@@ -7,6 +7,7 @@ import {
   planeIcon,
   clockIcon,
 } from "../data/mockFlights"; // Importa dados e ícones
+import{Link} from 'react-router-dom';
 
 interface FlightSelectionProps {
   // Para testar a página isoladamente, essas props podem ter valores padrão
@@ -22,10 +23,8 @@ export default function FlightSelection({
   const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
 
   // Ícone para o cabeçalho da página (avião de papel)
-  const paperPlaneHeaderIcon =
-    '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>';
-  const iconMapMarkerAlt =
-    '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>';
+  const paperPlaneHeaderIcon =    '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>';
+  // const iconMapMarkerAlt =    '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>';
 
   const handleConfirmSelection = (flight: Flight) => {
     console.log("Voo selecionado:", flight);
@@ -93,17 +92,16 @@ export default function FlightSelection({
         </div>
         {/* Footer Fixo */}
         <div className="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-xl border-t border-gray-200 flex justify-center space-x-4">
-          <button
+          <Link to="/itinerary"
             onClick={handleSkipSelection}
             className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
           >
             Pular Seleção de Voo
-          </button>
-          <button
+          </Link>
+          <Link to="/itinerary"
             onClick={() =>
               selectedFlight && handleConfirmSelection(selectedFlight)
             }
-            disabled={!selectedFlight}
             className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200
             ${
               selectedFlight
@@ -112,7 +110,7 @@ export default function FlightSelection({
             }`}
           >
             Confirmar Voo Selecionado
-          </button>
+          </Link>
         </div>
       </div>
     </div>
