@@ -1,61 +1,62 @@
 // src/components/FlightSelection/FlightCard.tsx
-import type { Flight } from '../../data/mockFlights'; // Importa a interface Flight
- // Importa a interface Flight
+import { type Flight, planeIcon, clockIcon } from '../../data/mockFlights'; // Importa a interface Flight e ícones genéricos
 
 interface FlightCardProps {
   flight: Flight;
-  // Ícones SVG para uso interno do card
-  planeIcon: string;
-  clockIcon: string;
 }
 
-export default function FlightCard({ flight, clockIcon }: FlightCardProps) {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+export default function FlightCard({ flight }: FlightCardProps) {
+  // Função auxiliar para extrair apenas a hora do string "DD de Mês. de YYYY, HH:MM"
+  const getHour = (dateTimeString: string) => {
+    const parts = dateTimeString.split(', ');
+    return parts.length > 1 ? parts[1] : dateTimeString;
   };
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md mb-4 flex items-center">
-      {/* Coluna da Esquerda: Companhia e Horários */}
-      <div className="flex-shrink-0 mr-4 text-center">
-        {/* Logo da Companhia / Ícone de Avião */}
-        <span className="inline-flex justify-center items-center w-8 h-8 text-blue-600 mb-1" dangerouslySetInnerHTML={{ __html: flight.airlineLogoIcon }} />
-        <p className="text-sm font-semibold text-gray-700">{flight.airline}</p>
+      {/* Coluna 1: Companhia Aérea e Número do Voo */}
+      {/* w-20 para uma largura fixa, text-center para centralizar conteúdo */}
+      <div className="flex-shrink-0 w-20 text-center mr-4"> 
+        {/* Ícone de Avião Genérico */}
+        <span className="inline-flex justify-center items-center w-8 h-8 text-blue-600 mb-1" dangerouslySetInnerHTML={{ __html: planeIcon }} />
+        {/* Mostra só a primeira palavra da companhia aérea (ex: GOL, LATAM) */}
+        <p className="text-sm font-semibold text-gray-700">{flight.companhiaAerea.split(' ')[0]}</p> 
+        <p className="text-xs text-gray-500">Voo {flight.numeroVoo}</p>
       </div>
 
-      {/* Coluna Central: Detalhes do Voo (Horários, Duração, Destino) */}
-      <div className="flex-grow flex flex-col items-center justify-center mx-4">
-        {/* Horários e Origem */}
-        <div className="flex items-center w-full justify-between">
-          <p className="text-lg font-bold text-gray-800">{flight.departureTime}</p>
-          <p className="text-sm text-gray-500">{flight.originAirport}</p>
-        </div>
-
-        {/* Linha de Duração e Seta */}
-        <div className="flex items-center w-full my-2">
-          <span className="text-gray-400 text-xl mx-2">→</span>
-          <div className="flex items-center text-gray-500 text-xs">
+      {/* Coluna 2: Detalhes do Voo (Horários, Duração, Origem e Destino) */}
+      {/* flex-grow para ocupar o espaço disponível, flex-col para layout vertical interno */}
+      <div className="flex-grow flex flex-col justify-center">
+        {/* Linha Superior: Horários de Partida e Chegada, com Duração no Meio */}
+        {/* justify-between para empurrar horários para as pontas, items-center para alinhar verticalmente */}
+        <div className="flex items-center justify-center mb-1">
+          {/* Horário de Partida */}
+          <p className="text-xl font-bold text-gray-800">{getHour(flight.dataHoraPartida)}</p>
+          
+          {/* Duração do Voo no Meio */}
+          <div className="flex items-center text-gray-500 text-sm mx-2">
             <span className="inline-flex justify-center items-center w-4 h-4 mr-1" dangerouslySetInnerHTML={{ __html: clockIcon }} />
-            {flight.duration}
+            {flight.duracao}
           </div>
-          <div className="flex-grow border-t border-gray-300 mx-2"></div>
+          
+          {/* Horário de Chegada */}
+          <p className="text-xl font-bold text-gray-800">{getHour(flight.dataHoraChegada)}</p>
         </div>
 
-        {/* Horário de Chegada e Destino */}
-        <div className="flex items-center w-full justify-between">
-          <p className="text-lg font-bold text-gray-800">{flight.arrivalTime}</p>
-          <p className="text-sm text-gray-500">{flight.destination}</p>
+        {/* Linha Inferior: Aeroportos de Origem e Destino com Seta */}
+        {/* justify-between para empurrar aeroportos para as pontas */}
+        <div className="flex items-center justify-center">
+          <p className="text-sm text-gray-500">{flight.origem}</p>
+          <span className="text-gray-400 text-lg mx-2">→</span> {/* Seta como separador */}
+          <p className="text-sm text-gray-500">{flight.destino}</p>
         </div>
       </div>
 
-      {/* Coluna da Direita: Preço e Tipo de Voo */}
-      <div className="flex-shrink-0 ml-4 text-right">
-        <p className="text-xl font-bold text-green-600">{formatCurrency(flight.price)}</p>
-        <p className="text-xs text-gray-500">por pessoa</p>
-        <span className={`inline-block px-2 py-1 mt-1 rounded text-xs font-semibold
-          ${flight.type === 'Direto' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
-          {flight.type}
-        </span>
+      {/* Coluna 3: Preços */}
+      {/* ml-4 para margem esquerda, text-right para alinhar texto à direita, min-w-[120px] para garantir espaço mínimo */}
+      <div className="flex-shrink-0 ml-4 text-right min-w-[150px]"> 
+        <p className="text-xl font-bold text-blue-600">{flight.precoTotal}</p>
+        <p className="text-xs text-gray-500">Total (Adultos: {flight.precoAdulto}, Crianças: {flight.precoCrianca})</p>
       </div>
     </div>
   );

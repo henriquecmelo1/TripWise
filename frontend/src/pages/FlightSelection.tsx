@@ -4,8 +4,6 @@ import FlightCard from "../components/FlightSelection/FlightCard";
 import {
   type Flight,
   mockFlights,
-  planeIcon,
-  clockIcon,
 } from "../data/mockFlights"; // Importa dados e ícones
 import{Link} from 'react-router-dom';
 
@@ -29,12 +27,7 @@ export default function FlightSelection({
   const handleConfirmSelection = (flight: Flight) => {
     console.log("Voo selecionado:", flight);
     alert(
-      `Voo selecionado: ${flight.airline} para ${
-        flight.destination
-      } por ${new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }).format(flight.price)}`
+      `Voo selecionado: ${flight.companhiaAerea} para ${flight.destino} por ${flight.precoTotal}`
     );
     // Lógica para o que acontece após confirmar o voo (ex: redirecionar, salvar no estado global)
   };
@@ -48,7 +41,7 @@ export default function FlightSelection({
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 p-6">
       {/* Cabeçalho da Página de Voo */}
-      <div className="bg-white rounded-xl shadow-lg p-6 my-6 text-center max-w-xl mx-auto w-full">
+      <div className="bg-white rounded-xl shadow-lg p-6 my-6 text-center max-w-4xl mx-auto w-full">
         {" "}
         {/* Adicionado max-w-xl e mx-auto para centralizar */}
         <h2 className="text-3xl font-bold text-gray-800 mb-2 flex items-center justify-center">
@@ -63,7 +56,7 @@ export default function FlightSelection({
           {tripDuration} dias
         </p>
         {/* Lista de Voos */}
-        <div className="flex-grow max-w-xl mx-auto w-full pb-20">
+        <div className="flex-grow max-w-3xl mx-auto w-full pb-20">
           {" "}
           {/* pb-20 para dar espaço ao footer fixo */}
           {mockFlights.length > 0 ? ( // Usando mockFlights diretamente para teste
@@ -79,8 +72,8 @@ export default function FlightSelection({
               >
                 <FlightCard
                   flight={flight}
-                  planeIcon={planeIcon} // Ícone de avião genérico do mockFlights
-                  clockIcon={clockIcon} // Ícone de relógio do mockFlights
+                  // planeIcon={planeIcon} // Ícone de avião genérico do mockFlights
+                  // clockIcon={clockIcon} // Ícone de relógio do mockFlights
                 />
               </div>
             ))
