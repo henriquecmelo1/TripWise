@@ -5,6 +5,10 @@ const router = express.Router();
 const aiController = new AIController();
 
 router.post("/itinerary/generate", async (req, res) => {
+  await aiController.generateItineraryFromForm(req, res);
+});
+
+router.post("/itinerary/generate-with-profile", async (req, res) => {
   await aiController.generateHyperPersonalizedItinerary(req, res);
 });
 
@@ -48,183 +52,172 @@ router.post("/emergency/support", async (req, res) => {
   await aiController.handleEmergencySupport(req, res);
 });
 
-router.get("/onboarding/questions", (req, res) => {
-  const questions = [
+router.get("/itinerary/form", (req, res) => {
+  const form = [
     {
-      id: "travel_motivation",
-      type: "multiple_choice",
-      question: "O que mais te motiva a viajar?",
-      options: [
-        { value: "relaxamento", label: "Relaxar e descansar" },
-        { value: "aventura", label: "Viver aventuras e experiências únicas" },
-        { value: "cultura", label: "Conhecer culturas e história" },
-        { value: "gastronomia", label: "Explorar a culinária local" },
-        { value: "natureza", label: "Conectar-se com a natureza" },
-        { value: "social", label: "Conhecer pessoas e socializar" },
-      ],
-    },
-    {
-      id: "budget_preference",
-      type: "scale",
-      question: "Como você classifica seu orçamento típico para viagens?",
-      scale: {
-        min: 1,
-        max: 5,
-        labels: [
-          "Muito econômico",
-          "Econômico",
-          "Moderado",
-          "Confortável",
-          "Luxuoso",
-        ],
-      },
-    },
-    {
-      id: "accommodation_type",
-      type: "multiple_choice",
-      question: "Que tipo de acomodação você prefere?",
-      options: [
-        { value: "hostel", label: "Hostel ou albergue" },
-        { value: "hotel_economico", label: "Hotel econômico" },
-        { value: "hotel_medio", label: "Hotel de categoria média" },
-        { value: "hotel_luxo", label: "Hotel de luxo" },
-        { value: "pousada", label: "Pousada local" },
-        { value: "airbnb", label: "Airbnb ou casa alugada" },
-        { value: "resort", label: "Resort all-inclusive" },
-      ],
-    },
-    {
-      id: "activity_preferences",
-      type: "multiple_select",
-      question: "Que tipos de atividades mais te interessam? (selecione até 5)",
-      maxSelections: 5,
-      options: [
-        { value: "museus", label: "Museus e galerias" },
-        { value: "monumentos", label: "Monumentos históricos" },
-        { value: "trilhas", label: "Trilhas e caminhadas" },
-        { value: "praias", label: "Praias e atividades aquáticas" },
-        { value: "vida_noturna", label: "Vida noturna e entretenimento" },
-        { value: "shopping", label: "Shopping e compras" },
-        { value: "esportes", label: "Esportes e atividades físicas" },
-        { value: "spa", label: "Spa e bem-estar" },
-        { value: "fotografia", label: "Fotografia e paisagens" },
-        { value: "culinaria", label: "Experiências gastronômicas" },
-        { value: "festivais", label: "Festivais e eventos culturais" },
-        { value: "natureza", label: "Parques naturais e vida selvagem" },
-      ],
-    },
-    {
-      id: "travel_pace",
-      type: "multiple_choice",
-      question: "Qual seu ritmo preferido de viagem?",
-      options: [
-        { value: "relaxed", label: "Relaxado - poucas atividades por dia" },
+      section: "trip_details",
+      title: "Detalhes da Viagem",
+      fields: [
         {
-          value: "moderate",
-          label: "Moderado - equilíbrio entre atividades e descanso",
+          id: "destination",
+          type: "text",
+          label: "Destino",
+          placeholder: "Ex: Lisboa, Portugal",
+          required: true,
         },
-        { value: "active", label: "Ativo - muitas atividades e experiências" },
         {
-          value: "intensive",
-          label: "Intensivo - aproveitar ao máximo cada momento",
+          id: "start_date",
+          type: "date",
+          label: "Data de início",
+          required: true,
+        },
+        {
+          id: "end_date",
+          type: "date",
+          label: "Data de fim",
+          required: true,
+        },
+        {
+          id: "travelers_count",
+          type: "number",
+          label: "Número de viajantes",
+          min: 1,
+          max: 20,
+          required: true,
+        },
+        {
+          id: "trip_type",
+          type: "select",
+          label: "Tipo de viagem",
+          options: [
+            { value: "lazer", label: "Lazer/Turismo" },
+            { value: "romantico", label: "Romântica" },
+            { value: "aventura", label: "Aventura" },
+            { value: "negócios", label: "Negócios" },
+            { value: "família", label: "Família" },
+            { value: "solo", label: "Solo" },
+          ],
+          required: true,
         },
       ],
     },
     {
-      id: "planning_style",
-      type: "multiple_choice",
-      question: "Como você prefere planejar suas viagens?",
-      options: [
+      section: "preferences",
+      title: "Suas Preferências",
+      fields: [
         {
-          value: "detalhado",
-          label: "Planejamento detalhado com horários fixos",
-        },
-        { value: "estruturado", label: "Estrutura básica com flexibilidade" },
-        { value: "flexivel", label: "Planejamento flexível e adaptável" },
-        { value: "espontaneo", label: "Espontâneo - decidir na hora" },
-      ],
-    },
-    {
-      id: "group_preference",
-      type: "multiple_choice",
-      question: "Com quantas pessoas você costuma viajar?",
-      options: [
-        { value: "solo", label: "Sozinho(a)" },
-        { value: "casal", label: "Em casal" },
-        { value: "familia_pequena", label: "Família pequena (3-4 pessoas)" },
-        { value: "familia_grande", label: "Família grande (5+ pessoas)" },
-        { value: "amigos_pequeno", label: "Grupo pequeno de amigos (2-4)" },
-        { value: "amigos_grande", label: "Grupo grande de amigos (5+)" },
-      ],
-    },
-    {
-      id: "food_restrictions",
-      type: "multiple_select",
-      question: "Você tem alguma restrição alimentar?",
-      options: [
-        { value: "nenhuma", label: "Nenhuma restrição" },
-        { value: "vegetariano", label: "Vegetariano" },
-        { value: "vegano", label: "Vegano" },
-        { value: "sem_gluten", label: "Sem glúten" },
-        { value: "sem_lactose", label: "Sem lactose" },
-        {
-          value: "alergias",
-          label: "Alergias específicas (especificar depois)",
-        },
-      ],
-    },
-    {
-      id: "transport_preference",
-      type: "multiple_select",
-      question: "Que meios de transporte você prefere?",
-      options: [
-        { value: "aviao", label: "Avião" },
-        { value: "carro_proprio", label: "Carro próprio" },
-        { value: "carro_alugado", label: "Carro alugado" },
-        { value: "transporte_publico", label: "Transporte público" },
-        { value: "uber_taxi", label: "Uber/Táxi" },
-        { value: "bicicleta", label: "Bicicleta" },
-        { value: "caminhada", label: "Caminhada" },
-        { value: "trem", label: "Trem" },
-        { value: "onibus", label: "Ônibus" },
-      ],
-    },
-    {
-      id: "authentic_experiences",
-      type: "multiple_choice",
-      question: "Que tipo de experiências autênticas mais te atrai?",
-      options: [
-        {
-          value: "locais_escondidos",
-          label: "Locais escondidos e menos conhecidos",
+          id: "budget_range",
+          type: "select",
+          label: "Faixa de orçamento para esta viagem",
+          options: [
+            { value: "economico", label: "Econômico - Até R$ 2.000" },
+            { value: "moderado", label: "Moderado - R$ 2.000 a R$ 5.000" },
+            {
+              value: "confortavel",
+              label: "Confortável - R$ 5.000 a R$ 10.000",
+            },
+            { value: "premium", label: "Premium - Acima de R$ 10.000" },
+          ],
+          required: true,
         },
         {
-          value: "interacao_locais",
-          label: "Interação genuína com moradores locais",
+          id: "accommodation_preference",
+          type: "select",
+          label: "Preferência de hospedagem",
+          options: [
+            { value: "hostel", label: "Hostel/Albergue" },
+            { value: "hotel_economico", label: "Hotel Econômico" },
+            { value: "hotel_medio", label: "Hotel Categoria Média" },
+            { value: "hotel_luxo", label: "Hotel de Luxo" },
+            { value: "pousada", label: "Pousada" },
+            { value: "airbnb", label: "Airbnb/Casa" },
+            { value: "resort", label: "Resort" },
+          ],
+          required: true,
         },
         {
-          value: "tradicoes_culturais",
-          label: "Tradições e festivais culturais",
+          id: "activity_interests",
+          type: "multi_select",
+          label: "Atividades de interesse (selecione até 5)",
+          maxSelections: 5,
+          options: [
+            { value: "cultura", label: "Cultura e História" },
+            { value: "gastronomia", label: "Gastronomia" },
+            { value: "aventura", label: "Aventura e Esportes" },
+            { value: "natureza", label: "Natureza e Paisagens" },
+            { value: "relaxamento", label: "Relaxamento e Bem-estar" },
+            { value: "vida_noturna", label: "Vida Noturna" },
+            { value: "shopping", label: "Compras" },
+            { value: "arte", label: "Arte e Museus" },
+            { value: "fotografia", label: "Fotografia" },
+            { value: "festivais", label: "Festivais e Eventos" },
+          ],
+          required: true,
         },
         {
-          value: "artesanato_local",
-          label: "Artesanato e produtos locais únicos",
+          id: "travel_pace",
+          type: "select",
+          label: "Ritmo de viagem preferido",
+          options: [
+            {
+              value: "relaxado",
+              label: "Relaxado - Poucas atividades por dia",
+            },
+            { value: "moderado", label: "Moderado - Equilíbrio" },
+            { value: "ativo", label: "Ativo - Muitas atividades" },
+            { value: "intensivo", label: "Intensivo - Máximo aproveitamento" },
+          ],
+          required: true,
         },
         {
-          value: "culinaria_tradicional",
-          label: "Culinária tradicional e familiar",
+          id: "food_restrictions",
+          type: "multi_select",
+          label: "Restrições alimentares",
+          options: [
+            { value: "nenhuma", label: "Nenhuma restrição" },
+            { value: "vegetariano", label: "Vegetariano" },
+            { value: "vegano", label: "Vegano" },
+            { value: "sem_gluten", label: "Sem glúten" },
+            { value: "sem_lactose", label: "Sem lactose" },
+            { value: "halal", label: "Halal" },
+            { value: "kosher", label: "Kosher" },
+          ],
         },
-        { value: "historia_oral", label: "História oral e narrativas locais" },
+        {
+          id: "transport_preferences",
+          type: "multi_select",
+          label: "Meios de transporte preferidos",
+          options: [
+            { value: "caminhada", label: "Caminhada" },
+            { value: "transporte_publico", label: "Transporte Público" },
+            { value: "taxi_uber", label: "Táxi/Uber" },
+            { value: "carro_alugado", label: "Carro Alugado" },
+            { value: "bicicleta", label: "Bicicleta" },
+            { value: "trem", label: "Trem" },
+          ],
+        },
+        {
+          id: "experience_type",
+          type: "select",
+          label: "Tipo de experiência desejada",
+          options: [
+            { value: "turistico", label: "Pontos turísticos principais" },
+            { value: "autentico", label: "Experiências autênticas locais" },
+            { value: "misto", label: "Mistura de ambos" },
+            { value: "off_beaten", label: "Locais pouco conhecidos" },
+          ],
+          required: true,
+        },
       ],
     },
   ];
 
   res.json({
     success: true,
-    questions: questions,
+    form: form,
     instructions:
-      "Complete este questionário para criarmos seu perfil personalizado de viagem",
-    estimated_time: "4-5 minutos",
+      "Preencha o formulário para gerar seu itinerário personalizado",
+    estimated_time: "2-3 minutos",
   });
 });
 

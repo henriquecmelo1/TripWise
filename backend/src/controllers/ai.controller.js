@@ -14,6 +14,210 @@ class AIController {
     }, 300000); // A cada 5 minutos
   }
 
+  /**
+   * Gera itinerário diretamente dos dados do formulário (sem salvar perfil)
+   */
+  async generateItineraryFromForm(req, res) {
+    try {
+      const { formData } = req.body;
+
+      if (!formData) {
+        return res.status(400).json({
+          success: false,
+          error: "formData é obrigatório",
+        });
+      }
+
+      const tripDetails = {
+        destination: formData.destination,
+        duration: this.calculateDuration(
+          formData.start_date,
+          formData.end_date
+        ),
+        startDate: formData.start_date,
+        endDate: formData.end_date,
+        travelers: formData.travelers_count,
+        tripType: formData.trip_type,
+      };
+
+      const temporaryProfile = this.createTemporaryProfile(formData);
+
+      const itineraryResult = await this.aiEngine.generatePersonalizedItinerary(
+        temporaryProfile,
+        tripDetails,
+        null
+      );
+
+      if (!itineraryResult.success) {
+        return res.status(500).json({
+          success: false,
+          error: "Erro na geração do itinerário",
+          details: itineraryResult.error,
+        });
+      }
+
+      res.json({
+        success: true,
+        itinerary: itineraryResult.itinerary,
+        tripDetails: tripDetails,
+        preferences: {
+          budget: formData.budget_range,
+          accommodation: formData.accommodation_preference,
+          activities: formData.activity_interests,
+          pace: formData.travel_pace,
+        },
+        generatedAt: itineraryResult.generatedAt,
+        message: "Itinerário gerado com sucesso para sua viagem!",
+      });
+    } catch (error) {
+      console.error("Erro ao gerar itinerário do formulário:", error);
+      res.status(500).json({
+        success: false,
+        error: "Erro interno do sistema de IA",
+        message: "Tente novamente em alguns momentos",
+      });
+    }
+  }
+
+  /**
+   * Calcula duração da viagem em dias
+   */
+  calculateDuration(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays + 1;
+  }
+
+  /**
+   * Cria perfil temporário baseado nos dados do formulário
+   */
+  createTemporaryProfile(formData) {
+    return {
+      id: `temp_${Date.now()}`,
+      travelDNA: this.inferTravelDNAFromForm(formData),
+      preferences: {
+        activities: formData.activity_interests || [],
+        foodRestrictions: formData.food_restrictions || [],
+        accommodationPrefs: {
+          type: formData.accommodation_preference,
+          location: "central",
+        },
+        transportation: {
+          preferred: formData.transport_preferences || [],
+        },
+        timing: {
+          pacePreference: formData.travel_pace,
+          flexibilityLevel: "medium",
+        },
+      },
+      budget: formData.budget_range,
+      accommodationType: formData.accommodation_preference,
+      interests: formData.activity_interests || [],
+      sensitivities: [],
+      travelStyle: this.determineTravelStyleFromForm(formData),
+      experienceType: formData.experience_type,
+      isTemporary: true,
+      confidence: 0.8,
+    };
+  }
+
+  /**
+   * Infere DNA de viagem baseado no formulário
+   */
+  inferTravelDNAFromForm(formData) {
+    const scores = {
+      explorador_aventureiro: 0,
+      cultural_historico: 0,
+      relaxamento_bem_estar: 0,
+      gastronomico_gourmet: 0,
+      natureza_ecoturismo: 0,
+      urbano_cosmopolita: 0,
+      budget_consciente: 0,
+      luxo_premium: 0,
+    };
+
+    // Analisa atividades de interesse
+    if (formData.activity_interests) {
+      formData.activity_interests.forEach((activity) => {
+        switch (activity) {
+          case "cultura":
+            scores.cultural_historico += 3;
+            break;
+          case "gastronomia":
+            scores.gastronomico_gourmet += 3;
+            break;
+          case "aventura":
+            scores.explorador_aventureiro += 3;
+            break;
+          case "natureza":
+            scores.natureza_ecoturismo += 3;
+            break;
+          case "relaxamento":
+            scores.relaxamento_bem_estar += 3;
+            break;
+          case "vida_noturna":
+          case "shopping":
+            scores.urbano_cosmopolita += 2;
+            break;
+          case "arte":
+            scores.cultural_historico += 2;
+            break;
+          case "fotografia":
+            scores.natureza_ecoturismo += 1;
+            scores.cultural_historico += 1;
+            break;
+        }
+      });
+    }
+
+    // Analisa orçamento
+    switch (formData.budget_range) {
+      case "economico":
+        scores.budget_consciente += 3;
+        break;
+      case "premium":
+        scores.luxo_premium += 3;
+        break;
+    }
+
+    // Analisa tipo de experiência
+    switch (formData.experience_type) {
+      case "autentico":
+        scores.cultural_historico += 2;
+        break;
+      case "off_beaten":
+        scores.explorador_aventureiro += 2;
+        break;
+    }
+
+    // Encontra categoria dominante
+    const dominantCategory = Object.entries(scores).reduce((a, b) =>
+      scores[a[0]] > scores[b[0]] ? a : b
+    )[0];
+
+    return {
+      primary: dominantCategory,
+      scores: scores,
+      confidence: 0.8,
+    };
+  }
+
+  /**
+   * Determina estilo de viagem baseado no formulário
+   */
+  determineTravelStyleFromForm(formData) {
+    switch (formData.travel_pace) {
+      case "relaxado":
+        return "flexible";
+      case "intensivo":
+        return "structured";
+      default:
+        return "moderate";
+    }
+  }
+
   async generateHyperPersonalizedItinerary(req, res) {
     try {
       const { userId, tripDetails, realTimeData } = req.body;
