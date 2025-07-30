@@ -140,6 +140,13 @@ PERFIL DO VIAJANTE:
 - Orçamento: ${userProfile.budget || "Moderado"}
 - Tipo de Acomodação: ${userProfile.accommodationType || "Conforto padrão"}
 - Interesses: ${userProfile.interests?.join(", ") || "Cultura, gastronomia"}
+- Restrições Alimentares: ${
+      userProfile.preferences?.foodRestrictions?.join(", ") || "Nenhuma"
+    }
+- Transporte Preferido: ${
+      userProfile.preferences?.transportation?.preferred?.join(", ") ||
+      "Flexível"
+    }
 - Sensibilidades: ${
       userProfile.sensitivities?.join(", ") || "Nenhuma especificada"
     }
@@ -163,15 +170,24 @@ DIRETRIZES PARA CRIAÇÃO (AGORA COM DADOS REAIS):
 1. Crie uma NARRATIVA TEMÁTICA coerente, não apenas uma lista
 2. Equilibre PERFEITAMENTE orçamento, tempo, logística e interesses
 3. USE OS RESTAURANTES REAIS listados acima nas recomendações
-4. RECOMENDE OS HOTÉIS REAIS baseado no perfil e orçamento do usuário
-5. CONSIDERE AS CONDIÇÕES METEOROLÓGICAS para sugerir atividades apropriadas
-6. INCLUA OS PREÇOS EM MOEDA LOCAL usando as taxas de câmbio atuais
-7. OTIMIZE o transporte usando as opções locais disponíveis
-8. MENCIONE os eventos locais quando relevantes
-9. Inclua "joias escondidas" e experiências autênticas locais
-9. Sugira alternativas para diferentes cenários (chuva, lotação, etc.)
-10. Inclua dicas práticas e contexto cultural
-11. Personalize cada recomendação ao perfil específico
+4. **FILTRE RESTAURANTES baseado nas restrições alimentares do usuário**
+5. **ADAPTE recomendações à preferência por autenticidade do usuário:**
+   - locais_escondidos: Priorize locais menos turísticos e únicos
+   - interacao_locais: Inclua atividades que promovam contato com moradores
+   - tradicoes_culturais: Foque em festivais e tradições locais
+   - artesanato_local: Recomende mercados e ateliês de artesãos
+   - culinaria_tradicional: Priorize restaurantes familiares e tradicionais
+   - historia_oral: Inclua tours com guias locais e narrativas históricas
+6. RECOMENDE OS HOTÉIS REAIS baseado no perfil e orçamento do usuário
+7. CONSIDERE AS CONDIÇÕES METEOROLÓGICAS para sugerir atividades apropriadas
+8. INCLUA OS PREÇOS EM MOEDA LOCAL usando as taxas de câmbio atuais
+9. OTIMIZE o transporte usando as opções locais disponíveis e preferências do usuário
+10. MENCIONE os eventos locais quando relevantes
+11. Inclua "joias escondidas" e experiências autênticas locais
+12. Sugira alternativas para diferentes cenários (chuva, lotação, etc.)
+13. Inclua dicas práticas e contexto cultural
+14. Personalize cada recomendação ao perfil específico
+15. **Para cada restaurante sugerido, confirme que atende às restrições alimentares**
 
 FORMATO DE RESPOSTA (JSON):
 {
@@ -197,8 +213,9 @@ FORMATO DE RESPOSTA (JSON):
                 }
             ],
             "refeicoes": {
-                "almoco": "Restaurante REAL da lista com justificativa",
-                "jantar": "Restaurante REAL da lista com justificativa"
+                "almoco": "Restaurante REAL da lista compatível com restrições alimentares",
+                "jantar": "Restaurante REAL da lista compatível com restrições alimentares",
+                "observacoes": "Notas sobre adequação às restrições alimentares"
             },
             "hospedagem": "Hotel REAL da lista adequado ao perfil e orçamento",
             "logistica": "Como se deslocar, onde se hospedar, etc."

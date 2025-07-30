@@ -167,10 +167,6 @@ router.get("/onboarding/questions", (req, res) => {
         { value: "vegano", label: "Vegano" },
         { value: "sem_gluten", label: "Sem glúten" },
         { value: "sem_lactose", label: "Sem lactose" },
-        { value: "halal", label: "Halal" },
-        { value: "kosher", label: "Kosher" },
-        { value: "hindu", label: "Hindu/Jainista" },
-        { value: "budista", label: "Budista" },
         {
           value: "alergias",
           label: "Alergias específicas (especificar depois)",
@@ -192,38 +188,6 @@ router.get("/onboarding/questions", (req, res) => {
         { value: "trem", label: "Trem" },
         { value: "onibus", label: "Ônibus" },
       ],
-    },
-    {
-      id: "flexibility_level",
-      type: "scale",
-      question: "Quão flexível você é com mudanças de planos?",
-      scale: {
-        min: 1,
-        max: 5,
-        labels: [
-          "Nada flexível",
-          "Pouco flexível",
-          "Moderadamente flexível",
-          "Muito flexível",
-          "Totalmente flexível",
-        ],
-      },
-    },
-    {
-      id: "sustainability_importance",
-      type: "scale",
-      question: "Qual a importância da sustentabilidade em suas viagens?",
-      scale: {
-        min: 1,
-        max: 5,
-        labels: [
-          "Não é importante",
-          "Pouco importante",
-          "Moderadamente importante",
-          "Muito importante",
-          "Extremamente importante",
-        ],
-      },
     },
     {
       id: "authentic_experiences",
@@ -253,22 +217,6 @@ router.get("/onboarding/questions", (req, res) => {
         { value: "historia_oral", label: "História oral e narrativas locais" },
       ],
     },
-    {
-      id: "technology_comfort",
-      type: "scale",
-      question: "Quão confortável você é com tecnologia durante viagens?",
-      scale: {
-        min: 1,
-        max: 5,
-        labels: [
-          "Prefiro métodos tradicionais",
-          "Uso básico de tecnologia",
-          "Confortável com apps essenciais",
-          "Usuário avançado de tecnologia",
-          "Early adopter - adoro novidades",
-        ],
-      },
-    },
   ];
 
   res.json({
@@ -276,7 +224,7 @@ router.get("/onboarding/questions", (req, res) => {
     questions: questions,
     instructions:
       "Complete este questionário para criarmos seu perfil personalizado de viagem",
-    estimated_time: "5-7 minutos",
+    estimated_time: "4-5 minutos",
   });
 });
 
