@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-// import { getFlights } from "./flights/flights.js";
+import { getFlights } from "./flights/flights.js";
 import aiRoutes from "./routes/ai.routes.js";
 
 const app = express();
@@ -21,7 +21,7 @@ app.use((req, res, next) => {
 });
 
 // Rotas existentes
-// app.post("/flights/search", getFlights);
+app.post("/flights/search", getFlights);
 
 app.use("/api/ai", aiRoutes);
 

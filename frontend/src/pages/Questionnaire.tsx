@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Header from "../components/Questionnaire/Header";
 import InputText from "../components/Questionnaire/InputText";
 import SelectInput from "../components/Questionnaire/SelectInput";
+import MultiSelectInput from "../components/UserProfile/InputMultiSelect";
 import DateInput from "../components/Questionnaire/InputDate";
 import InputNumber from "../components/Questionnaire/InputNumber";
 import {
@@ -17,11 +18,17 @@ import {
 } from "../assets/icons";
 
 import {
-  dailyBudgetRanges,
+  tripTypeOptions,
+  // dailyBudgetRanges,
   budgetOptions,
-  companionshipOptions,
+  // companionshipOptions,
+  accommodationOptions,
+  activityInterestsOptions,
+  travelPaceOptions,
+  foodRestrictionsOptions,
   transportationOptions,
-  vibeOptions,
+  // vibeOptions,
+  experienceTypeOptions
 } from "../data/questionnaireOptions";
 import { useNavigate } from "react-router-dom";
 
@@ -33,74 +40,37 @@ export default function Questionnaire() {
   const [numCriancas, setNumCriancas] = useState<number>(0);
   const [numBebes, setNumBebes] = useState<number>(0);
 
+  const [tipoViagem, setTipoViagem] = useState<string>("");
   const [orcamento, setOrcamento] = useState<string>("");
-  const [companhia, setCompanhia] = useState<string>("");
-  const [transporte, setTransporte] = useState<string>("");
-  const [vibe, setVibe] = useState<string>("");
-
+  const [acomodacao, setAcomodacao] = useState<string>("");
+  const [interessesAtividades, setInteressesAtividades] = useState<string[]>([]);
+  const [ritmoViagem, setRitmoViagem] = useState<string>("");
+  const [restricoesAlimentares, setRestricoesAlimentares] = useState<string[]>([]);
+  const [transporte, setTransporte] = useState<string[]>([]);
+  const [experiencia, setExperiencia] = useState<string>("");
   const [dataIda, setDataIda] = useState<string | null>(null);
   const [dataVolta, setDataVolta] = useState<string | null>(null);
 
-  const [custoEstimado, setCustoEstimado] = useState<{
-    min: number;
-    avg: number;
-    max: number;
-  } | null>(null);
-
-  const [roteirosGerados, setRoteirosGerados] = useState<object | null>(null);
+  
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
+  
+
+  
+
+  const calculateTravelersCount = (
+    numAdultos: number,
+    numCriancas: number,
+    numBebes: number
+  ): number => {
+    return numAdultos + numCriancas + numBebes;
   };
 
-  const calculateDurationInDays = (
-    start: string | null,
-    end: string | null
-  ): number | null => {
-    if (!start || !end) return null;
-    const startDate = new Date(start);
-    const endDate = new Date(end);
 
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      return null;
-    }
 
-    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays + 1; // Inclusive duration
-  };
-
-  useEffect(() => {
-    const calculatedDuration = calculateDurationInDays(dataIda, dataVolta);
-
-    // O custo é geralmente calculado por adulto para o orçamento por pessoa/dia
-    if (
-      calculatedDuration !== null &&
-      calculatedDuration > 0 &&
-      numAdultos > 0 &&
-      orcamento &&
-      dailyBudgetRanges[orcamento]
-    ) {
-      const budget = dailyBudgetRanges[orcamento];
-      const minDaily = budget.min;
-      const maxDaily = budget.max;
-
-      const minTotal = calculatedDuration * numAdultos * minDaily; // Usando numAdultos
-      const maxTotal = calculatedDuration * numAdultos * maxDaily;
-      const avgTotal = (minTotal + maxTotal) / 2;
-
-      setCustoEstimado({ min: minTotal, avg: avgTotal, max: maxTotal });
-    } else {
-      setCustoEstimado(null);
-    }
-  }, [dataIda, dataVolta, numAdultos, orcamento]); // Dependências atualizadas
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -108,43 +78,117 @@ export default function Questionnaire() {
     setIsLoading(true);
     setError(null);
 
+    const totalViajantes = calculateTravelersCount(numAdultos, numCriancas, numBebes);
+
     const formData = {
-      origem,
-      destino,
-      numAdultos, 
-      numCriancas, 
-      numBebes, 
-      orcamento,
-      companhia,
-      transporte,
-      vibe,
-      dataIda,
-      dataVolta,
+      // origem,
+      "destination": destino,
+      "start_date": dataIda,
+      "end_date": dataVolta,
+      // numAdultos, 
+      // numCriancas, 
+      // numBebes,
+      "travelers_count": totalViajantes, 
+      "trip_type": tipoViagem,
+      "budget_range": orcamento,
+      "accommodation_type": acomodacao,
+      "activity_interests": interessesAtividades,
+      "travel_pace": ritmoViagem,
+      "food_restrictions": restricoesAlimentares,
+      "transport_preferences": transporte,
+      "experience_type": experiencia
     };
 
     console.log("Dados do formulário para envio:", formData);
+    const dataToSend={formData: formData};
+
+    const departureFlightData = {
+      "originCode": origem,
+      "destinationCode": destino,
+      "dateOfDeparture": dataIda,
+      "currency": "BRL",
+      "adults": numAdultos,
+      "children": numCriancas,
+      "infants": numBebes,
+      "max": 3
+    };
+
+    const returnFlightData = {
+      "originCode": destino,
+      "destinationCode": origem,
+      "dateOfDeparture": dataVolta,
+      "currency": "BRL",
+      "adults": numAdultos,
+      "children": numCriancas,
+      "infants": numBebes,
+      "max": 3
+    };
 
     try {
-      const response = await fetch("http://localhost:3001/api/roteiros", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      // const response = await fetch("http://localhost:3000/api/ai/itinerary/generate", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(dataToSend),
+      // });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      // if (!response.ok) {
+      //   const errorData = await response.json();
+      //   throw new Error(
+      //     errorData.message || `Erro do servidor: ${response.status}`
+      //   );
+      // }
+
+      // const data = await response.json();
+      // console.log("Resposta do backend:", data);
+      // setRoteirosGerados(data);
+      // navigate("/flights")
+      const [departureResponse, returnResponse, itineraryResponse] = await Promise.all([
+        fetch("http://localhost:3000/flights/search", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(departureFlightData),
+        }),
+        fetch("http://localhost:3000/flights/search", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(returnFlightData),
+        }),
+        fetch("http://localhost:3000/api/ai/itinerary/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataToSend),
+        }),
+      ]);
+      if (!departureResponse.ok || !returnResponse.ok || !itineraryResponse.ok) {
+        const errorData = await itineraryResponse.json();
         throw new Error(
-          errorData.message || `Erro do servidor: ${response.status}`
+          errorData.message || `Erro do servidor: ${itineraryResponse.status}`
         );
       }
+      const departureData = await departureResponse.json();
+      const returnData = await returnResponse.json();
+      const itineraryData = await itineraryResponse.json();
 
-      const data = await response.json();
-      console.log("Resposta do backend:", data);
-      setRoteirosGerados(data);
-      navigate("/flights")
+      console.log("Resposta do backend (voos de ida):", departureData);
+      console.log("Resposta do backend (voos de volta):", returnData);
+      console.log("Resposta do backend (roteiros):", itineraryData);
+      
+      navigate("/flights", {
+        state: {
+          departureFlights: departureData,
+          returnFlights: returnData,
+          itineraries: itineraryData,
+        },
 
+      });
     } catch (err) {
       console.error("Erro ao enviar o formulário:", err);
       setError(
@@ -195,7 +239,6 @@ export default function Questionnaire() {
           minDate={dataIda || new Date().toISOString().split("T")[0]}
         />
 
-        {/* NOVO: Inputs para Adultos, Crianças e Bebês */}
         <InputNumber
           label="Quantos adultos?"
           icon={iconAdult} // Ícone de adulto
@@ -224,83 +267,78 @@ export default function Questionnaire() {
         />
 
         <SelectInput
-          label="Qual seu orçamento por pessoa por dia?"
+          label="Qual é o tipo da sua viagem?"
+          icon={iconUsers}
+          placeholder="Selecione o tipo de viagem"
+          options={tripTypeOptions}
+          value={tipoViagem}
+          onChange={setTipoViagem}
+        />
+
+        <SelectInput
+          label="Qual é o seu orçamento?"
           icon={iconDollarSign}
-          placeholder="Selecione seu orçamento por pessoa/dia"
+          placeholder="Selecione o orçamento"
           options={budgetOptions}
           value={orcamento}
           onChange={setOrcamento}
         />
 
-        {custoEstimado && (
-          <div className="p-5 bg-blue-50 border border-blue-200 rounded-lg shadow-md mt-6">
-            <h3 className="flex items-center text-blue-800 font-bold text-lg mb-4">
-              <span
-                className="inline-flex justify-center items-center w-6 h-6 mr-3 text-blue-600"
-                dangerouslySetInnerHTML={{ __html: iconDollarSign }}
-              />
-              Custo Total Estimado da Viagem
-            </h3>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="p-3 bg-white rounded-md">
-                <p className="text-gray-600 text-sm">Mínimo</p>
-                <p className="text-green-600 font-bold text-lg">
-                  {formatCurrency(custoEstimado.min)}
-                </p>
-              </div>
-              <div className="p-3 bg-white rounded-md">
-                <p className="text-gray-600 text-sm">Média</p>
-                <p className="text-blue-600 font-bold text-lg">
-                  {formatCurrency(custoEstimado.avg)}
-                </p>
-              </div>
-              <div className="p-3 bg-white rounded-md">
-                <p className="text-gray-600 text-sm">Máximo</p>
-                <p className="text-orange-600 font-bold text-lg">
-                  {formatCurrency(custoEstimado.max)}
-                </p>
-              </div>
-            </div>
-            <p className="text-center text-gray-500 text-xs mt-4">
-              {calculateDurationInDays(dataIda, dataVolta)} dias × {numAdultos}{" "}
-              adulto{numAdultos !== 1 ? "s" : ""}{" "}
-              {numCriancas > 0
-                ? `× ${numCriancas} criança${numCriancas !== 1 ? "s" : ""} `
-                : ""}{" "}
-              {numBebes > 0
-                ? `× ${numBebes} bebê${numBebes !== 1 ? "s" : ""} `
-                : ""}{" "}
-              × orçamento por dia
-            </p>
-          </div>
-        )}
-
         <SelectInput
-          label="Com quem você vai viajar?"
-          icon={iconUsers}
-          placeholder="Selecione sua companhia"
-          options={companionshipOptions}
-          value={companhia}
-          onChange={setCompanhia}
-        />
-
-        <SelectInput
-          label="Como prefere se locomover?"
-          icon={iconCarSide}
-          placeholder="Selecione o meio de transporte"
-          options={transportationOptions}
-          value={transporte}
-          onChange={setTransporte}
-        />
-
-        <SelectInput
-          label="Qual é a vibe da viagem?"
+          label="Qual é o tipo de acomodação preferida?"
           icon={iconStar}
-          placeholder="Selecione a vibe da viagem"
-          options={vibeOptions}
-          value={vibe}
-          onChange={setVibe}
+          placeholder="Selecione o tipo de acomodação"
+          options={accommodationOptions}
+          value={acomodacao}
+          onChange={setAcomodacao}
         />
+
+        <MultiSelectInput
+          question="Quais atividades você mais gosta?"
+          icon={iconStar}
+          options={activityInterestsOptions}
+          selectedValues={interessesAtividades}
+          onChange={setInteressesAtividades}
+          maxSelections={5} // Limite de 5 seleções
+        />
+
+        <SelectInput
+          label="Qual é o ritmo da sua viagem?"
+          icon={iconCalendar}
+          placeholder="Selecione o ritmo da viagem"
+          options={travelPaceOptions}
+          value={ritmoViagem}
+          onChange={setRitmoViagem}
+        />
+
+        <MultiSelectInput
+          question="Você tem alguma restrição alimentar?"
+          icon={iconStar}
+          options={foodRestrictionsOptions}
+          selectedValues={restricoesAlimentares}
+          onChange={setRestricoesAlimentares}
+          maxSelections={3} // Limite de 3 seleções
+        />
+
+        <MultiSelectInput
+          question="Quais meios de transporte você prefere?"
+          icon={iconCarSide}
+          options={transportationOptions}
+          selectedValues={transporte}
+          onChange={setTransporte}
+          maxSelections={3} // Limite de 3 seleções
+        />
+
+        <SelectInput
+          label="Qual é o tipo de experiência que você busca?"
+          icon={iconStar}
+          placeholder="Selecione o tipo de experiência"
+          options={experienceTypeOptions}
+          value={experiencia}
+          onChange={setExperiencia}
+        />
+
+        
 
         <button
           type="submit"
@@ -325,19 +363,7 @@ export default function Questionnaire() {
           </div>
         )}
 
-        {roteirosGerados && (
-          <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg shadow-md">
-            <h2 className="text-2xl font-semibold text-blue-800 mb-4">
-              Seus Roteiros Personalizados:
-            </h2>
-            <pre className="bg-blue-100 p-4 rounded-md overflow-auto text-sm text-blue-900">
-              {JSON.stringify(roteirosGerados, null, 2)}
-            </pre>
-            <p className="mt-4 text-blue-700">
-              Aqui você pode formatar os roteiros de forma mais amigável!
-            </p>
-          </div>
-        )}
+        
       </form>
     </div>
   );

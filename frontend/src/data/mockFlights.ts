@@ -18,6 +18,8 @@ export interface Flight {
   // Se o backend enviar 'type', adicione-o aqui.
 }
 
+
+
 export const mockFlights: Flight[] = [
   {
     "id": "1",

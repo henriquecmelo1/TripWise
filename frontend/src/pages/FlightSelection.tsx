@@ -7,19 +7,20 @@ import {
 } from "../data/mockFlights"; // Importa dados e ícones
 import{Link} from 'react-router-dom';
 import {paperPlaneHeaderIcon} from '../assets/icons'; // Ícone de avião de papel para o cabeçalho
+import { useLocation } from 'react-router-dom'; // NOVO: Importa useLocation
 
-interface FlightSelectionProps {
-  // Para testar a página isoladamente, essas props podem ter valores padrão
-  // Em uma aplicação real, elas seriam passadas via router ou contexto
-  destinationCity?: string;
-  tripDuration?: number;
-}
 
-export default function FlightSelection({
-  destinationCity = "Rio de Janeiro", // Valor padrão para teste
-  tripDuration = 10, // Valor padrão para teste
-}: FlightSelectionProps) {
+export default function FlightSelection() {
   const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
+  // NOVO: Obtém os dados da viagem da localização
+  const location = useLocation();
+  const {departureFlights, itineraries, returnFlights} = location.state as {
+    departureFlights: Flight[]; 
+    itineraries: object; 
+    returnFlights: Flight[];
+  }; 
+  
+   // Log para verificar os dados recebidos
 
   const handleConfirmSelection = (flight: Flight) => {
     console.log("Voo selecionado:", flight);
@@ -34,6 +35,11 @@ export default function FlightSelection({
     alert("Você pulou a seleção de voo.");
     // Lógica para o que acontece após pular (ex: redirecionar para outra página)
   };
+  const flight1 = departureFlights[0];
+
+
+
+  
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 p-6">
@@ -46,18 +52,17 @@ export default function FlightSelection({
             className="inline-flex justify-center items-center w-8 h-8 mr-3 text-blue-600"
             dangerouslySetInnerHTML={{ __html: paperPlaneHeaderIcon }}
           />
-          Escolha seu voo para {destinationCity}
+          Escolha seu voo para {flight1.destino}
         </h2>
         <p className="text-gray-600 text-md">
-          Encontramos as melhores opções de voo para sua viagem de{" "}
-          {tripDuration} dias
+          Encontramos as melhores opções de voo para sua viagem de {"*TODO* ida ou volta"}
         </p>
         {/* Lista de Voos */}
         <div className="flex-grow max-w-3xl mx-auto w-full pb-20">
           {" "}
           {/* pb-20 para dar espaço ao footer fixo */}
           {mockFlights.length > 0 ? ( // Usando mockFlights diretamente para teste
-            mockFlights.map((flight) => (
+            departureFlights.map((flight) => (
               <div
                 key={flight.id}
                 onClick={() => setSelectedFlight(flight)}
