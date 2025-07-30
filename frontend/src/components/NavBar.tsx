@@ -19,6 +19,15 @@ export default function Navbar() {
       {/* Links de Navegação (Lado Direito) */}
       <div className="flex space-x-6">
         <NavLink
+          to="/profile"
+          className={({ isActive }) =>
+            `text-lg font-medium hover:text-blue-600 transition-colors ${isActive ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-700'}`
+          }
+        >
+          Perfil
+        </NavLink>
+
+        <NavLink
           to="/forms"
           className={({ isActive }) =>
             `text-lg font-medium hover:text-blue-600 transition-colors ${isActive ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-700'}`
