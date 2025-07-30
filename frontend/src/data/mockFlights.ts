@@ -1,13 +1,3 @@
-// src/data/mockFlights.ts
-
-// Ícones SVG para as companhias aéreas (placeholders)
-// const iconLatam = '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15H9V9h2v8zm3 0h-2V9h2v8zm3 0h-2V9h2v8z"/></svg>'; // Exemplo genérico
-// const iconAzul = '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15H9V9h2v8zm3 0h-2V9h2v8zm3 0h-2V9h2v8z"/></svg>'; // Exemplo genérico
-// const iconGol = '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15H9V9h2v8zm3 0h-2V9h2v8zm3 0h-2V9h2v8z"/></svg>'; // Exemplo genérico
-// const iconTap = '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15H9V9h2v8zm3 0h-2V9h2v8zm3 0h-2V9h2v8z"/></svg>'; // Exemplo genérico
-
-export const planeIcon = '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9L2 14v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1V20.5L14 19v-2.5l8 2.5z"/></svg>'; // Ícone de avião genérico
-export const clockIcon = '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-.5-13h1V7h-1zm0 2h1v4h-1z"/></svg>'; // Ícone de relógio
 
 // NOVO: Definição da interface Flight
 export interface Flight {

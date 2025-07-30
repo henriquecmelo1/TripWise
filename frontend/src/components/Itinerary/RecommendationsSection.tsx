@@ -3,14 +3,14 @@ import { type RecomendacoesHospedagem } from '../../data/mockItineraryResponse';
 
 interface RecommendationsSectionProps {
   recommendations: RecomendacoesHospedagem;
-  iconBed: string;
+  iconHotel: string;
 }
 
-export default function RecommendationsSection({ recommendations, iconBed }: RecommendationsSectionProps) {
+export default function RecommendationsSection({ recommendations, iconHotel }: RecommendationsSectionProps) {
   return (
     <div>
       <h3 className="text-2xl font-bold text-gray-700 mb-4 flex items-center">
-        <span className="inline-flex justify-center items-center w-7 h-7 mr-3 text-red-500" dangerouslySetInnerHTML={{ __html: iconBed }} />
+        <span className="inline-flex justify-center items-center w-7 h-7 mr-3 text-red-500" dangerouslySetInnerHTML={{ __html: iconHotel }} />
         Recomendações de Hospedagem
       </h3>
       <div className="bg-red-50 p-5 rounded-lg shadow-sm border border-red-200">

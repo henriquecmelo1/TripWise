@@ -8,7 +8,7 @@ interface DailyItinerarySectionProps {
   iconCalendar: string;
   iconActivity: string;
   iconMeals: string;
-  iconBed: string;
+  iconHotel: string;
   iconBriefcase: string;
 }
 
@@ -17,7 +17,7 @@ export default function DailyItinerarySection({
   iconCalendar,
   iconActivity,
   iconMeals,
-  iconBed,
+  iconHotel,
   iconBriefcase,
 }: DailyItinerarySectionProps) {
   return (
@@ -29,7 +29,7 @@ export default function DailyItinerarySection({
           iconCalendar={iconCalendar}
           iconActivity={iconActivity}
           iconMeals={iconMeals}
-          iconBed={iconBed}
+          iconHotel={iconHotel}
           iconBriefcase={iconBriefcase}
         />
       ))}

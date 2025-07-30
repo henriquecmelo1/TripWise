@@ -9,7 +9,7 @@ interface DayCardProps {
   iconCalendar: string;
   iconActivity: string;
   iconMeals: string;
-  iconBed: string;
+  iconHotel: string;
   iconBriefcase: string;
 }
 
@@ -18,7 +18,7 @@ export default function DayCard({
   iconCalendar,
   iconActivity,
   iconMeals,
-  iconBed,
+  iconHotel,
   iconBriefcase,
 }: DayCardProps) {
   return (
@@ -45,7 +45,7 @@ export default function DayCard({
       <AccommodationLogisticsCard
         hospedagem={day.hospedagem}
         logistica={day.logistica}
-        iconBed={iconBed}
+        iconHotel={iconHotel}
         iconBriefcase={iconBriefcase}
       />
     </div>

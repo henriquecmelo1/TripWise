@@ -6,6 +6,7 @@ import {
   mockFlights,
 } from "../data/mockFlights"; // Importa dados e ícones
 import{Link} from 'react-router-dom';
+import {paperPlaneHeaderIcon} from '../assets/icons'; // Ícone de avião de papel para o cabeçalho
 
 interface FlightSelectionProps {
   // Para testar a página isoladamente, essas props podem ter valores padrão
@@ -19,10 +20,6 @@ export default function FlightSelection({
   tripDuration = 10, // Valor padrão para teste
 }: FlightSelectionProps) {
   const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
-
-  // Ícone para o cabeçalho da página (avião de papel)
-  const paperPlaneHeaderIcon =    '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>';
-  // const iconMapMarkerAlt =    '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>';
 
   const handleConfirmSelection = (flight: Flight) => {
     console.log("Voo selecionado:", flight);
