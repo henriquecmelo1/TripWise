@@ -14,7 +14,7 @@ export default function FlightSelection() {
   const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
   // NOVO: Obtém os dados da viagem da localização
   const location = useLocation();
-  const {departureFlights, itineraries, returnFlights} = location.state as {
+  const {departureFlights} = location.state as {
     departureFlights: Flight[]; 
     itineraries: object; 
     returnFlights: Flight[];

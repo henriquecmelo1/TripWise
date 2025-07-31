@@ -99,7 +99,6 @@ export default function Questionnaire() {
       "experience_type": experiencia
     };
 
-    console.log("Dados do formulário para envio:", formData);
     const dataToSend={formData: formData};
 
     const departureFlightData = {
@@ -125,25 +124,6 @@ export default function Questionnaire() {
     };
 
     try {
-      // const response = await fetch("http://localhost:3000/api/ai/itinerary/generate", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(dataToSend),
-      // });
-
-      // if (!response.ok) {
-      //   const errorData = await response.json();
-      //   throw new Error(
-      //     errorData.message || `Erro do servidor: ${response.status}`
-      //   );
-      // }
-
-      // const data = await response.json();
-      // console.log("Resposta do backend:", data);
-      // setRoteirosGerados(data);
-      // navigate("/flights")
       const [departureResponse, returnResponse, itineraryResponse] = await Promise.all([
         fetch("http://localhost:3000/flights/search", {
           method: "POST",
@@ -177,9 +157,7 @@ export default function Questionnaire() {
       const returnData = await returnResponse.json();
       const itineraryData = await itineraryResponse.json();
 
-      console.log("Resposta do backend (voos de ida):", departureData);
-      console.log("Resposta do backend (voos de volta):", returnData);
-      console.log("Resposta do backend (roteiros):", itineraryData);
+
       
       navigate("/flights", {
         state: {
