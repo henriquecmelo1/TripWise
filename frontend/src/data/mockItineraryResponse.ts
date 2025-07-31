@@ -1,5 +1,3 @@
-// src/data/mockItineraryResponse.ts
-
 export interface Atividade {
   horario: string;
   atividade: string;
@@ -55,17 +53,20 @@ export interface ItineraryData {
   consideracoesEspeciais: string;
 }
 
+export interface PersonalizedFor {
+  userId: string;
+  travelDNA: string;
+  confidence: number;
+}
+
 export interface BackendItineraryResponse {
   success: boolean;
   itinerary: ItineraryData;
-  personalizedFor: {
-    userId: string;
-    travelDNA: string;
-    confidence: number;
-  };
-  generatedAt: string;
+  personalizedFor: PersonalizedFor;
+  generatedAt: string; // ISO string, e.g., "2025-07-31T23:59:00Z"
   recommendation: string;
 }
+
 
 // O JSON fornecido na sua pergunta
 export const mockItineraryResponse: BackendItineraryResponse = {

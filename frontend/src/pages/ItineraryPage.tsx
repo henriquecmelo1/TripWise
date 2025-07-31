@@ -1,5 +1,5 @@
 // src/pages/ItineraryPage.tsx
-import { type BackendItineraryResponse, mockItineraryResponse } from '../data/mockItineraryResponse';
+import { type BackendItineraryResponse } from '../data/mockItineraryResponse';
 import { iconDiamond, iconCalendar, iconActivity, iconMeals, iconHotel as iconHotel, iconBriefcase, iconStar, iconLightbulb, iconDollarSign } from '../assets/icons';
 
 // Importa os novos componentes
@@ -9,14 +9,26 @@ import RecommendationsSection from '../components/Itinerary/RecommendationsSecti
 import ExperiencesGemsTipsSection from '../components/Itinerary/ExperiencesGemsTipsSection';
 import BudgetSection from '../components/Itinerary/BudgetSection';
 import SpecialConsiderationsSection from '../components/Itinerary/SpecialConsiderationsSection';
-import ItineraryFooter from '../components/Itinerary/Footer';
+import { useLocation } from 'react-router-dom';
 
 
-interface ItineraryPageProps {
-  itineraryData?: BackendItineraryResponse;
-}
 
-export default function ItineraryPage({ itineraryData = mockItineraryResponse }: ItineraryPageProps) {
+
+export default function ItineraryPage() {
+  const location = useLocation();
+
+  const itineraryData: BackendItineraryResponse = location.state.itinerary;
+  
+  if(!itineraryData) {
+    return(<div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          Nenhum itinerário encontrado
+        </h2>
+        <p className="text-gray-600">
+          Por favor, volte e preencha o formulário corretamente.
+        </p>
+      </div>)
+  }
   const itinerary = itineraryData.itinerary;
 
   return (
@@ -60,11 +72,6 @@ export default function ItineraryPage({ itineraryData = mockItineraryResponse }:
           </div>
         </div>
 
-        <ItineraryFooter
-          personalizedFor={itineraryData.personalizedFor}
-          generatedAt={itineraryData.generatedAt}
-          recommendation={itineraryData.recommendation}
-        />
       </div>
     </div>
   );
