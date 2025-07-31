@@ -1,5 +1,5 @@
 import './App.css'
-import FlightSelection from './pages/FlightSelection'
+import Navbar from './components/NavBar'
 import Flights from './pages/Flights'
 import ItineraryPage from './pages/ItineraryPage'
 import Questionnaire from './pages/Questionnaire'
@@ -8,7 +8,8 @@ import { Routes, Route } from 'react-router-dom'
 
 function App() {
 
-  return (
+  return (<>
+    <Navbar></Navbar>
     <Routes>
       <Route path='/forms' element={<Questionnaire />} />
       <Route path='/flights' element={<Flights />} />
@@ -16,6 +17,7 @@ function App() {
       <Route path='/' element={<Questionnaire />} />
 
     </Routes>
+    </>
   )
 }
 

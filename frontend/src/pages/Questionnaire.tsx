@@ -163,7 +163,7 @@ export default function Questionnaire() {
         state: {
           departureFlights: departureData,
           returnFlights: returnData,
-          itineraries: itineraryData,
+          itinerary: itineraryData,
         },
 
       });
