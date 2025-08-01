@@ -105,8 +105,8 @@ export default function Questionnaire() {
     const dataToSend = { formData: formData };
 
     const departureFlightData = {
-      originCode: origem,
-      destinationCode: destino,
+      originCity: origem,
+      destinationCity: destino,
       dateOfDeparture: dataIda,
       currency: "BRL",
       adults: numAdultos,
@@ -116,8 +116,8 @@ export default function Questionnaire() {
     };
 
     const returnFlightData = {
-      originCode: destino,
-      destinationCode: origem,
+      originCity: destino,
+      destinationCity: origem,
       dateOfDeparture: dataVolta,
       currency: "BRL",
       adults: numAdultos,

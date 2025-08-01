@@ -2,6 +2,7 @@ import 'dotenv/config';
 
 import Amadeus from 'amadeus';
 import { Duration, DateTime } from 'luxon';
+import { findAirport } from '../ai/airports.js';
 
 const amadeus = new Amadeus({
     clientId: process.env.AMADEUS_API_KEY,
@@ -11,8 +12,8 @@ const amadeus = new Amadeus({
 export async function getFlights(req, res) {
 
     const {
-        originCode,
-        destinationCode,
+        originCity,
+        destinationCity,
         dateOfDeparture,
         currency,
         adults,
@@ -20,10 +21,12 @@ export async function getFlights(req, res) {
         infants,
         max
     } = req.body;
+    
+    console.log(originCity)
 
     // default values if not provided in the body
-    const finalOriginCode = originCode;
-    const finalDestinationCode = destinationCode;
+    const finalOriginCode = await findAirport(originCity);
+    const finalDestinationCode = await findAirport(destinationCity);
     const finalDateOfDeparture = dateOfDeparture;
     const finalCurrency = currency || 'BRL';
     const finalAdults = adults !== undefined ? parseInt(adults) : 1;
