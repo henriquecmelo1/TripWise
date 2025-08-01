@@ -15,6 +15,7 @@ import {
   iconCarSide,
   iconStar,
   iconCalendar,
+  iconClock,
 } from "../assets/icons";
 
 import {
@@ -28,38 +29,39 @@ import {
   foodRestrictionsOptions,
   transportationOptions,
   // vibeOptions,
-  experienceTypeOptions
+  experienceTypeOptions,
 } from "../data/questionnaireOptions";
 import { useNavigate } from "react-router-dom";
+import ToggleSwitch from "../components/Questionnaire/ToggleSwitch";
 
 export default function Questionnaire() {
   const [origem, setOrigem] = useState<string>("");
   const [destino, setDestino] = useState<string>("");
 
-  const [numAdultos, setNumAdultos] = useState<number>(1); 
+  const [numAdultos, setNumAdultos] = useState<number>(1);
   const [numCriancas, setNumCriancas] = useState<number>(0);
   const [numBebes, setNumBebes] = useState<number>(0);
 
   const [tipoViagem, setTipoViagem] = useState<string>("");
   const [orcamento, setOrcamento] = useState<string>("");
   const [acomodacao, setAcomodacao] = useState<string>("");
-  const [interessesAtividades, setInteressesAtividades] = useState<string[]>([]);
+  const [interessesAtividades, setInteressesAtividades] = useState<string[]>(
+    []
+  );
   const [ritmoViagem, setRitmoViagem] = useState<string>("");
-  const [restricoesAlimentares, setRestricoesAlimentares] = useState<string[]>([]);
+  const [restricoesAlimentares, setRestricoesAlimentares] = useState<string[]>(
+    []
+  );
   const [transporte, setTransporte] = useState<string[]>([]);
   const [experiencia, setExperiencia] = useState<string>("");
   const [dataIda, setDataIda] = useState<string | null>(null);
   const [dataVolta, setDataVolta] = useState<string | null>(null);
+  const [agendarVoo, setAgendarVoo] = useState<boolean>(false);
 
-  
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
-
-  
-
-  
 
   const calculateTravelersCount = (
     numAdultos: number,
@@ -69,104 +71,132 @@ export default function Questionnaire() {
     return numAdultos + numCriancas + numBebes;
   };
 
-
-
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     setIsLoading(true);
     setError(null);
 
-    const totalViajantes = calculateTravelersCount(numAdultos, numCriancas, numBebes);
+    const totalViajantes = calculateTravelersCount(
+      numAdultos,
+      numCriancas,
+      numBebes
+    );
 
     const formData = {
       // origem,
-      "destination": destino,
-      "start_date": dataIda,
-      "end_date": dataVolta,
-      // numAdultos, 
-      // numCriancas, 
+      destination: destino,
+      start_date: dataIda,
+      end_date: dataVolta,
+      // numAdultos,
+      // numCriancas,
       // numBebes,
-      "travelers_count": totalViajantes, 
-      "trip_type": tipoViagem,
-      "budget_range": orcamento,
-      "accommodation_type": acomodacao,
-      "activity_interests": interessesAtividades,
-      "travel_pace": ritmoViagem,
-      "food_restrictions": restricoesAlimentares,
-      "transport_preferences": transporte,
-      "experience_type": experiencia
+      travelers_count: totalViajantes,
+      trip_type: tipoViagem,
+      budget_range: orcamento,
+      accommodation_type: acomodacao,
+      activity_interests: interessesAtividades,
+      travel_pace: ritmoViagem,
+      food_restrictions: restricoesAlimentares,
+      transport_preferences: transporte,
+      experience_type: experiencia,
     };
 
-    const dataToSend={formData: formData};
+    const dataToSend = { formData: formData };
 
     const departureFlightData = {
-      "originCode": origem,
-      "destinationCode": destino,
-      "dateOfDeparture": dataIda,
-      "currency": "BRL",
-      "adults": numAdultos,
-      "children": numCriancas,
-      "infants": numBebes,
-      "max": 3
+      originCode: origem,
+      destinationCode: destino,
+      dateOfDeparture: dataIda,
+      currency: "BRL",
+      adults: numAdultos,
+      children: numCriancas,
+      infants: numBebes,
+      max: 3,
     };
 
     const returnFlightData = {
-      "originCode": destino,
-      "destinationCode": origem,
-      "dateOfDeparture": dataVolta,
-      "currency": "BRL",
-      "adults": numAdultos,
-      "children": numCriancas,
-      "infants": numBebes,
-      "max": 3
+      originCode: destino,
+      destinationCode: origem,
+      dateOfDeparture: dataVolta,
+      currency: "BRL",
+      adults: numAdultos,
+      children: numCriancas,
+      infants: numBebes,
+      max: 3,
     };
 
     try {
-      const [departureResponse, returnResponse, itineraryResponse] = await Promise.all([
-        fetch("http://localhost:3000/flights/search", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+      if (agendarVoo) {
+        const [departureResponse, returnResponse, itineraryResponse] =
+          await Promise.all([
+            fetch("http://localhost:3000/flights/search", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(departureFlightData),
+            }),
+            fetch("http://localhost:3000/flights/search", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(returnFlightData),
+            }),
+            fetch("http://localhost:3000/api/ai/itinerary/generate", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
+            }),
+          ]);
+        if (
+          !departureResponse.ok ||
+          !returnResponse.ok ||
+          !itineraryResponse.ok
+        ) {
+          const errorData = await itineraryResponse.json();
+          throw new Error(
+            errorData.message || `Erro do servidor: ${itineraryResponse.status}`
+          );
+        }
+        const departureData = await departureResponse.json();
+        const returnData = await returnResponse.json();
+        const itineraryData = await itineraryResponse.json();
+
+        navigate("/flights", {
+          state: {
+            departureFlights: departureData,
+            returnFlights: returnData,
+            itinerary: itineraryData,
           },
-          body: JSON.stringify(departureFlightData),
-        }),
-        fetch("http://localhost:3000/flights/search", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(returnFlightData),
-        }),
-        fetch("http://localhost:3000/api/ai/itinerary/generate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(dataToSend),
-        }),
-      ]);
-      if (!departureResponse.ok || !returnResponse.ok || !itineraryResponse.ok) {
-        const errorData = await itineraryResponse.json();
-        throw new Error(
-          errorData.message || `Erro do servidor: ${itineraryResponse.status}`
+        });
+      } else {
+        const itineraryResponse = await fetch(
+          "http://localhost:3000/api/ai/itinerary/generate",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dataToSend),
+          }
         );
+        if (!itineraryResponse.ok) {
+          const errorData = await itineraryResponse.json();
+          throw new Error(
+            errorData.message || `Erro do servidor: ${itineraryResponse.status}`
+          );
+        }
+        const itineraryData = await itineraryResponse.json();
+        navigate("/itinerary", {
+          state: {
+            itinerary: itineraryData,
+          },
+        });
       }
-      const departureData = await departureResponse.json();
-      const returnData = await returnResponse.json();
-      const itineraryData = await itineraryResponse.json();
-
-
-      
-      navigate("/flights", {
-        state: {
-          departureFlights: departureData,
-          returnFlights: returnData,
-          itinerary: itineraryData,
-        },
-
-      });
     } catch (err) {
       console.error("Erro ao enviar o formulário:", err);
       setError(
@@ -316,11 +346,15 @@ export default function Questionnaire() {
           onChange={setExperiencia}
         />
 
-        
+        <ToggleSwitch
+          label="Deseja agendar voo?"
+          value={agendarVoo}
+          onToggle={setAgendarVoo}
+          icon={iconClock}
+        />
 
         <button
           type="submit"
-          // disabled={isLoading}
           className={`w-full py-4 px-6 rounded-lg text-white text-xl font-bold
                       bg-gradient-to-r from-primary to-accent
                       hover:opacity-90 transition-all duration-300
@@ -340,8 +374,6 @@ export default function Questionnaire() {
             <p>{error}</p>
           </div>
         )}
-
-        
       </form>
     </div>
   );
