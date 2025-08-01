@@ -1,5 +1,5 @@
 // src/components/Itinerary/RecommendationsSection.tsx
-import { type RecomendacoesHospedagem } from '../../data/mockItineraryResponse';
+import { type RecomendacoesHospedagem } from '../../data/itineraryInterface';
 
 interface RecommendationsSectionProps {
   recommendations: RecomendacoesHospedagem;

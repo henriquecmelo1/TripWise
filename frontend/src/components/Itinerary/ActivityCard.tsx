@@ -1,5 +1,5 @@
 // src/components/Itinerary/ActivityCard.tsx
-import { type Atividade } from '../../data/mockItineraryResponse';
+import { type Atividade } from '../../data/itineraryInterface';
 
 interface ActivityCardProps {
   activity: Atividade;

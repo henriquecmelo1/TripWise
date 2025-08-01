@@ -1,5 +1,5 @@
 // src/components/Itinerary/DailyItinerarySection.tsx
-import { type ItinerarioDiario } from '../../data/mockItineraryResponse'; // Importa a interface
+import { type ItinerarioDiario } from '../../data/itineraryInterface'; // Importa a interface
 import DayCard from './DayCard'; 
 
 interface DailyItinerarySectionProps {

@@ -1,17 +1,15 @@
-// src/components/UserProfile/MultiSelectInput.tsx
 import FormGroup from '../Questionnaire/FormGroup';
-import { type QuestionOption } from '../../data/userProfileQuestions'; // Importa QuestionOption
-
-interface MultiSelectInputProps {
+import { type Option } from '../../data/questionnaireOptions';
+interface InputMultiSelect {
   question: string;
   icon: string; // Ícone SVG
-  options: QuestionOption[];
+  options: Option[];
   selectedValues: string[]; // Array de valores selecionados
   onChange: (newSelectedValues: string[]) => void;
   maxSelections?: number; // Número máximo de seleções permitidas
 }
 
-export default function MultiSelectInput({ question, icon, options, selectedValues, onChange, maxSelections }: MultiSelectInputProps) {
+export default function InputMultiSelect({ question, icon, options, selectedValues, onChange, maxSelections }: InputMultiSelect) {
   const handleToggle = (value: string) => {
     const isSelected = selectedValues.includes(value);
     let newSelection: string[];

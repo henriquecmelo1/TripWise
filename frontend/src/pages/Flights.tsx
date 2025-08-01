@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlightList from "../components/FlightSelection/FlightList"; // O componente do passo 1
-import { type Flight } from "../data/mockFlights";
+import { type Flight } from "../data/flightInterface";
+import { paperPlaneHeaderIcon } from "../assets/icons"; // Ícone do cabeçalho
 
 export default function Flights() {
   const navigate = useNavigate();
@@ -30,9 +31,6 @@ export default function Flights() {
     null
   );
 
-  // Ícone para o cabeçalho da página (avião de papel)
-  const paperPlaneHeaderIcon =
-    '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>';
 
   const handleConfirmSelection = () => {
     if (selectedIdaFlight && selectedVoltaFlight) {

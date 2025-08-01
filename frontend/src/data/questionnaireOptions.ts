@@ -18,12 +18,6 @@ export const tripTypeOptions: Option[] = [
   { value: "solo", label: "Solo" },
 ];
 
-// export const dailyBudgetRanges: { [key: string]: BudgetRange } = {
-//   economico: { min: 50, max: 200 },
-//   moderado: { min: 200, max: 500 },
-//   confortavel: { min: 500, max: 800 },
-//   luxo: { min: 800, max: 2500 },
-// };
 
 export const budgetOptions: Option[] = [
   {value: "economico", label: "Econômico - Até R$ 2.000"},
@@ -74,12 +68,6 @@ export const foodRestrictionsOptions: Option[] = [
   { value: "kosher", label: "Kosher" },
 ];
 
-// export const companionshipOptions: Option[] = [
-//   { value: "sozinho", label: "Sozinho(a)" },
-//   { value: "familia", label: "Com a família" },
-//   { value: "amigos", label: "Com amigos" },
-//   { value: "parceiro", label: "Com parceiro(a)" },
-// ];
 
 export const transportationOptions: Option[] = [
   // multiselect
@@ -98,12 +86,4 @@ export const experienceTypeOptions: Option[] = [
   { value: "off_beaten", label: "Locais pouco conhecidos" },
 ];
 
-// export const vibeOptions: Option[] = [
-//   { value: "romantico", label: "Romântico" },
-//   { value: "animado", label: "Animado" },
-//   { value: "divertido", label: "Divertido" },
-//   { value: "descanso", label: "Para descanso" },
-//   { value: "aventura", label: "Aventura" },
-//   { value: "cultural", label: "Cultural" },
-//   { value: "gastronomico", label: "Gastronômico" },
-// ];
+

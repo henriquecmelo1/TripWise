@@ -1,5 +1,5 @@
 // src/components/Itinerary/DayCard.tsx
-import { type ItinerarioDiario } from '../../data/mockItineraryResponse';
+import { type ItinerarioDiario } from '../../data/itineraryInterface';
 import ActivityCard from './ActivityCard';
 import MealCard from './MealCard';
 import AccommodationLogisticsCard from './AccommodationLogisticsCard';

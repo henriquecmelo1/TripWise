@@ -1,5 +1,5 @@
 // src/pages/ItineraryPage.tsx
-import { type BackendItineraryResponse } from '../data/mockItineraryResponse';
+import { type BackendItineraryResponse } from '../data/itineraryInterface';
 import { iconDiamond, iconCalendar, iconActivity, iconMeals, iconHotel as iconHotel, iconBriefcase, iconStar, iconLightbulb, iconDollarSign } from '../assets/icons';
 
 // Importa os novos componentes

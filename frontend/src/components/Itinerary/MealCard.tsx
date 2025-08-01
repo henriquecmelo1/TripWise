@@ -1,6 +1,6 @@
 // src/components/Itinerary/MealCard.tsx
 import React from 'react';
-import { type Refeicoes } from '../../data/mockItineraryResponse';
+import { type Refeicoes } from '../../data/itineraryInterface';
 
 interface MealCardProps {
   meals: Refeicoes;

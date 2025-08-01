@@ -1,5 +1,5 @@
 // src/components/Itinerary/BudgetSection.tsx
-import { type OrcamentoDetalhado } from '../../data/mockItineraryResponse';
+import { type OrcamentoDetalhado } from '../../data/itineraryInterface';
 
 interface BudgetSectionProps {
   budget: OrcamentoDetalhado;

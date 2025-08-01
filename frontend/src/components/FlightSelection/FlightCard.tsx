@@ -1,5 +1,5 @@
 // src/components/FlightSelection/FlightCard.tsx
-import { type Flight } from "../../data/mockFlights";
+import { type Flight } from "../../data/flightInterface";
 import { planeIcon, clockIcon } from "../../assets/icons"; // Importa a interface Flight e ícones genéricos
 
 interface FlightCardProps {

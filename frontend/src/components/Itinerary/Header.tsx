@@ -1,5 +1,5 @@
 // src/components/Itinerary/ItineraryHeader.tsx
-import { type ItineraryData } from '../../data/mockItineraryResponse'; // Importa a interface
+import { type ItineraryData } from '../../data/itineraryInterface'; // Importa a interface
 
 interface ItineraryHeaderProps {
   itinerary: ItineraryData;

@@ -5,7 +5,7 @@ interface Option {
   label: string;
 }
 
-interface SelectInputProps {
+interface InputSelectProps {
   label: string;
   icon: string;
   placeholder: string;
@@ -14,7 +14,7 @@ interface SelectInputProps {
   onChange: (value: string) => void;
 }
 
-export default function SelectInput({ label, icon, placeholder, options, value, onChange }: SelectInputProps) {
+export default function InputSelect({ label, icon, placeholder, options, value, onChange }: InputSelectProps) {
   return (
     <FormGroup label={label} icon={icon}>
       <select

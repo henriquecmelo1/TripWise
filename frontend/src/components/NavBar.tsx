@@ -1,7 +1,7 @@
 // src/components/Navbar.tsx
 import {  useLocation, useNavigate } from 'react-router-dom'; // Importa Link e NavLink para navegação
 import { iconMapMarkerAlt } from '../assets/icons';
-import { type Flight } from '../data/mockFlights'; // Importa a interface de voo
+import { type Flight } from '../data/flightInterface'; // Importa a interface de voo
 
 export default function Navbar() {
 

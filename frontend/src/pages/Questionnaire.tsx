@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import Header from "../components/Questionnaire/Header";
 import InputText from "../components/Questionnaire/InputText";
-import SelectInput from "../components/Questionnaire/SelectInput";
-import MultiSelectInput from "../components/UserProfile/InputMultiSelect";
-import DateInput from "../components/Questionnaire/InputDate";
+import InputSelect from "../components/Questionnaire/InputSelect";
+import InputMultiSelect from "../components/Questionnaire/InputMultiSelect";
+import InputDate from "../components/Questionnaire/InputDate";
 import InputNumber from "../components/Questionnaire/InputNumber";
 import {
   iconMapMarkerAlt,
@@ -199,7 +199,7 @@ export default function Questionnaire() {
           onChange={setDestino}
         />
 
-        <DateInput
+        <InputDate
           label="Data de ida"
           icon={iconCalendar}
           selectedDate={dataIda}
@@ -208,7 +208,7 @@ export default function Questionnaire() {
           minDate={new Date().toISOString().split("T")[0]}
         />
 
-        <DateInput
+        <InputDate
           label="Data de volta"
           icon={iconCalendar}
           selectedDate={dataVolta}
@@ -244,7 +244,7 @@ export default function Questionnaire() {
           placeholder="Nº de bebês"
         />
 
-        <SelectInput
+        <InputSelect
           label="Qual é o tipo da sua viagem?"
           icon={iconUsers}
           placeholder="Selecione o tipo de viagem"
@@ -253,7 +253,7 @@ export default function Questionnaire() {
           onChange={setTipoViagem}
         />
 
-        <SelectInput
+        <InputSelect
           label="Qual é o seu orçamento?"
           icon={iconDollarSign}
           placeholder="Selecione o orçamento"
@@ -262,7 +262,7 @@ export default function Questionnaire() {
           onChange={setOrcamento}
         />
 
-        <SelectInput
+        <InputSelect
           label="Qual é o tipo de acomodação preferida?"
           icon={iconStar}
           placeholder="Selecione o tipo de acomodação"
@@ -271,7 +271,7 @@ export default function Questionnaire() {
           onChange={setAcomodacao}
         />
 
-        <MultiSelectInput
+        <InputMultiSelect
           question="Quais atividades você mais gosta?"
           icon={iconStar}
           options={activityInterestsOptions}
@@ -280,7 +280,7 @@ export default function Questionnaire() {
           maxSelections={5} // Limite de 5 seleções
         />
 
-        <SelectInput
+        <InputSelect
           label="Qual é o ritmo da sua viagem?"
           icon={iconCalendar}
           placeholder="Selecione o ritmo da viagem"
@@ -289,7 +289,7 @@ export default function Questionnaire() {
           onChange={setRitmoViagem}
         />
 
-        <MultiSelectInput
+        <InputMultiSelect
           question="Você tem alguma restrição alimentar?"
           icon={iconStar}
           options={foodRestrictionsOptions}
@@ -298,7 +298,7 @@ export default function Questionnaire() {
           maxSelections={3} // Limite de 3 seleções
         />
 
-        <MultiSelectInput
+        <InputMultiSelect
           question="Quais meios de transporte você prefere?"
           icon={iconCarSide}
           options={transportationOptions}
@@ -307,7 +307,7 @@ export default function Questionnaire() {
           maxSelections={3} // Limite de 3 seleções
         />
 
-        <SelectInput
+        <InputSelect
           label="Qual é o tipo de experiência que você busca?"
           icon={iconStar}
           placeholder="Selecione o tipo de experiência"

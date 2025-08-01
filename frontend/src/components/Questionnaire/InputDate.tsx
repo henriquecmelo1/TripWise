@@ -1,4 +1,4 @@
-// src/components/Questionnaire/DateInput.tsx
+// src/components/Questionnaire/InputDate.tsx
 import FormGroup from './FormGroup'; // Reutiliza o FormGroup, assim como InputText faz
 
 interface DateInputProps {
@@ -11,7 +11,7 @@ interface DateInputProps {
   maxDate?: string; // Data máxima permitida no formato YYYY-MM-DD
 }
 
-export default function DateInput({
+export default function InputDate({
   label,
   icon,
   selectedDate,

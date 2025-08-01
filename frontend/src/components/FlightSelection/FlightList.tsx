@@ -1,6 +1,6 @@
 // src/components/FlightSelection/FlightList.tsx
 import FlightCard from './FlightCard'; // O card de voo que você já tem
-import { type Flight } from '../../data/mockFlights';
+import { type Flight } from '../../data/flightInterface';
 import { planeIcon } from '../../assets/icons'; // A interface de voo
 
 interface FlightListProps {
