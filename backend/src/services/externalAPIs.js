@@ -11,6 +11,8 @@ import {
   ERROR_MESSAGES,
   DEFAULT_CURRENCIES,
 } from "../constants/externalAPIs.constants.js";
+import logger from "../utils/logger.js";
+import rateLimiter from "../middleware/rateLimiting.js";
 
 class ExternalAPIsService {
   constructor() {
@@ -28,18 +30,36 @@ class ExternalAPIsService {
   }
 
   async getWeatherData(destination, dates) {
+    const startTime = Date.now();
+    
     try {
+      // Verifica rate limit
+      rateLimiter.checkApiLimit("weather");
+
       if (!this.isWeatherForecastAvailable(dates)) {
+        logger.warn("Previsão meteorológica não disponível", { 
+          destination, 
+          dates,
+          reason: "dates_out_of_range" 
+        });
+        
         return {
           success: false,
           error: ERROR_MESSAGES.WEATHER_NOT_AVAILABLE,
           message: ERROR_MESSAGES.WEATHER_RELIABILITY,
-          fallback: ERROR_MESSAGES.WEATHER_FALLBACK,
+          fallback: this.generateWeatherFallback(destination),
           canProvideHistoricalData: true,
         };
       }
 
       const weatherData = await this.getOpenWeatherData(destination, dates);
+      
+      logger.logExternalApiCall(
+        "OpenWeather", 
+        `forecast/${destination}`, 
+        true, 
+        Date.now() - startTime
+      );
 
       return {
         success: true,
@@ -50,12 +70,15 @@ class ExternalAPIsService {
         validUntil: this.getValidForecastDate(),
       };
     } catch (error) {
-      console.error("Erro ao obter dados meteorológicos:", error);
-      return {
-        success: false,
-        error: "Dados meteorológicos não disponíveis",
-        fallback: ERROR_MESSAGES.WEATHER_TRAVEL_ADVICE,
-      };
+      logger.logExternalApiCall(
+        "OpenWeather", 
+        `forecast/${destination}`, 
+        false, 
+        Date.now() - startTime,
+        error
+      );
+
+      return this.generateWeatherFallback(destination, error);
     }
   }
 
@@ -408,6 +431,152 @@ class ExternalAPIsService {
     if (categoryNames.includes("hostel")) return HOTEL_TYPES.HOSTEL;
 
     return HOTEL_TYPES.STANDARD;
+  }
+
+  /**
+   * Gera fallback para dados meteorológicos quando API falha
+   */
+  generateWeatherFallback(destination, error = null) {
+    const month = new Date().getMonth();
+    const isWinter = month === 11 || month === 0 || month === 1;
+    const isSummer = month >= 5 && month <= 7;
+
+    // Recomendações genéricas baseadas na época do ano
+    const seasonalAdvice = [];
+    if (isWinter) {
+      seasonalAdvice.push("Leve roupas quentes e agasalhos");
+      seasonalAdvice.push("Verifique se há aquecimento na hospedagem");
+    } else if (isSummer) {
+      seasonalAdvice.push("Leve roupas leves e protetor solar");
+      seasonalAdvice.push("Mantenha-se hidratado");
+    } else {
+      seasonalAdvice.push("Leve roupas para clima variável");
+      seasonalAdvice.push("Tenha um casaco leve sempre à mão");
+    }
+
+    return {
+      success: false,
+      error: "Dados meteorológicos não disponíveis",
+      fallback: {
+        message: "Consulte a previsão do tempo local antes da viagem",
+        seasonalAdvice,
+        generalTips: [
+          "Verifique a previsão 24h antes da viagem",
+          "Prepare-se para mudanças climáticas inesperadas",
+          "Consulte fontes locais de meteorologia"
+        ],
+      },
+      source: "Fallback Sazonal",
+    };
+  }
+
+  /**
+   * Gera fallback para restaurantes quando API falha
+   */
+  generateRestaurantFallback(location) {
+    return {
+      success: false,
+      error: "Dados de restaurantes não disponíveis",
+      fallback: {
+        message: "Explore restaurantes locais usando essas dicas",
+        suggestions: [
+          "Pergunte aos locais por recomendações",
+          "Busque restaurantes com boa movimentação",
+          "Evite locais muito turísticos para experiência autêntica",
+          "Consulte apps locais como Zomato ou TripAdvisor"
+        ],
+        alternatives: [
+          "Google Maps - busque por 'restaurantes próximos'",
+          "TripAdvisor - filtre por avaliações altas",
+          "Yelp (se disponível na região)"
+        ],
+      },
+      source: "Fallback Genérico",
+    };
+  }
+
+  /**
+   * Gera fallback para hotéis quando API falha
+   */
+  generateHotelFallback(location) {
+    return {
+      success: false,
+      error: "Dados de hotéis não disponíveis",
+      fallback: {
+        message: "Use estas plataformas confiáveis para hospedagem",
+        platforms: [
+          "Booking.com - maior variedade",
+          "Airbnb - experiências locais",
+          "Hotels.com - programas de fidelidade",
+          "Expedia - pacotes completos"
+        ],
+        tips: [
+          "Reserve com antecedência para melhores preços",
+          "Verifique políticas de cancelamento",
+          "Leia avaliações recentes de outros hóspedes",
+          "Considere localização vs preço"
+        ],
+      },
+      source: "Fallback Genérico",
+    };
+  }
+
+  /**
+   * Verifica saúde das APIs externas
+   */
+  async checkApiHealth() {
+    const health = {
+      weather: false,
+      places: false,
+      exchange: false,
+      timestamp: new Date().toISOString(),
+    };
+
+    // Testa OpenWeather
+    try {
+      if (this.apis.weather.openWeather) {
+        const response = await fetch(
+          `${API_BASE_URLS.OPENWEATHER}/weather?q=London&appid=${this.apis.weather.openWeather}`,
+          { signal: AbortSignal.timeout(5000) }
+        );
+        health.weather = response.ok;
+      }
+    } catch (error) {
+      logger.debug("Weather API health check failed", { error: error.message });
+    }
+
+    // Testa Foursquare
+    try {
+      if (this.apis.places.foursquare) {
+        const response = await fetch(
+          `${API_BASE_URLS.FOURSQUARE}/places/search?near=London&limit=1`,
+          {
+            headers: {
+              authorization: `Bearer ${this.apis.places.foursquare}`,
+            },
+            signal: AbortSignal.timeout(5000),
+          }
+        );
+        health.places = response.ok;
+      }
+    } catch (error) {
+      logger.debug("Places API health check failed", { error: error.message });
+    }
+
+    // Testa Exchange
+    try {
+      if (this.apis.exchange.exchangeRate) {
+        const response = await fetch(
+          `${API_BASE_URLS.EXCHANGE_RATE}/${this.apis.exchange.exchangeRate}/latest/USD`,
+          { signal: AbortSignal.timeout(5000) }
+        );
+        health.exchange = response.ok;
+      }
+    } catch (error) {
+      logger.debug("Exchange API health check failed", { error: error.message });
+    }
+
+    return health;
   }
 }
 

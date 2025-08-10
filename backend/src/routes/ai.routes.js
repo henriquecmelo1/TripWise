@@ -1,24 +1,42 @@
 import express from "express";
 import AIController from "../controllers/ai.controller.js";
+import ValidationMiddleware from "../middleware/validation.js";
+import rateLimiter from "../middleware/rateLimiting.js";
 
 const router = express.Router();
 const aiController = new AIController();
 
-router.post("/itinerary/generate", async (req, res) => {
-  await aiController.generateItineraryFromForm(req, res);
-});
+// Endpoint com validação e rate limiting específico
+router.post("/itinerary/generate", 
+  rateLimiter.createEndpointLimiter("/api/ai/itinerary/generate"),
+  ValidationMiddleware.validateItineraryForm,
+  async (req, res) => {
+    await aiController.generateItineraryFromForm(req, res);
+  }
+);
 
-router.post("/itinerary/generate-with-profile", async (req, res) => {
-  await aiController.generateHyperPersonalizedItinerary(req, res);
-});
+router.post("/itinerary/generate-with-profile", 
+  rateLimiter.createEndpointLimiter("/api/ai/itinerary/generate"),
+  async (req, res) => {
+    await aiController.generateHyperPersonalizedItinerary(req, res);
+  }
+);
 
-router.post("/chat", async (req, res) => {
-  await aiController.conversationalInterface(req, res);
-});
+router.post("/chat", 
+  rateLimiter.createEndpointLimiter("/api/ai/chat"),
+  ValidationMiddleware.validateChatMessage,
+  async (req, res) => {
+    await aiController.conversationalInterface(req, res);
+  }
+);
 
-router.post("/profile/create", async (req, res) => {
-  await aiController.createUserProfile(req, res);
-});
+router.post("/profile/create", 
+  rateLimiter.createEndpointLimiter("/api/ai/profile/create"),
+  ValidationMiddleware.validateProfileCreation,
+  async (req, res) => {
+    await aiController.createUserProfile(req, res);
+  }
+);
 
 router.get("/profile/:userId", async (req, res) => {
   await aiController.getUserProfile(req, res);
@@ -34,6 +52,15 @@ router.post("/itinerary/optimize", async (req, res) => {
 
 router.get("/health", async (req, res) => {
   await aiController.healthCheck(req, res);
+});
+
+router.get("/status", (req, res) => {
+  const rateLimitStats = rateLimiter.getStats();
+  res.json({
+    success: true,
+    rateLimitStats,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 router.get("/itinerary/form", (req, res) => {
