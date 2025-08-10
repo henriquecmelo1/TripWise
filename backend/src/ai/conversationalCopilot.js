@@ -70,71 +70,46 @@ class ConversationalCopilot {
   }
 
   /**
-   * Analisa a intenção da mensagem do usuário
+   * Analisa a intenção da mensagem do usuário de forma simples
    */
   async analyzeIntent(message, conversation, context) {
-    try {
-      const prompt = `
-Analise a seguinte mensagem de um usuário de aplicativo de viagens e identifique a intenção:
-
-MENSAGEM: "${message}"
-
-CONTEXTO DA CONVERSA:
-${conversation.messages
-  .slice(-3)
-  .map((m) => `${m.role}: ${m.content}`)
-  .join("\n")}
-
-CONTEXTO ATUAL:
-- Localização: ${context.currentLocation || "Não especificada"}
-- Etapa da viagem: ${context.travelPhase || "Planejamento"}
-- Itinerário ativo: ${context.hasActiveItinerary || false}
-
-INTENÇÕES POSSÍVEIS:
-1. PLANEJAMENTO_INICIAL - Usuário quer criar um novo itinerário
-2. MODIFICACAO_ITINERARIO - Usuário quer alterar plano existente
-3. BUSCA_INFORMACOES - Usuário quer informações sobre destino/atividade
-4. RESERVAS_BOOKINGS - Usuário quer fazer reservas
-5. NAVEGACAO_DURANTE_VIAGEM - Usuário está viajando e precisa de orientação
-6. RECOMENDACAO_CONTEXTUAL - Usuário quer sugestões para situação atual
-7. PROBLEMA_SUPORTE - Usuário tem um problema ou reclamação
-8. CONVERSA_CASUAL - Conversa geral sobre viagens
-
-RESPOSTA (JSON):
-{
-    "type": "TIPO_DA_INTENCAO",
-    "confidence": 0.95,
-    "entities": {
-        "destino": "cidade/país mencionado",
-        "datas": "datas mencionadas",
-        "atividades": "atividades mencionadas",
-        "restricoes": "restrições ou preferências"
-    },
-    "context_needed": ["informações adicionais necessárias"],
-    "urgency": "baixa|media|alta"
-}`;
-
-      const response = await this.genAI.models.generateContent({
-        contents: prompt,
-        model: this.aiEngine.model,
-      });
-
-      return JSON.parse(
-        response.text
-          .replace(/```json\n?/g, "")
-          .replace(/```/g, "")
-          .trim()
-      );
-    } catch (error) {
-      console.error("Erro na análise de intenção:", error);
+    // Análise simples baseada em palavras-chave
+    const lowerMessage = message.toLowerCase();
+    
+    if (lowerMessage.includes("planejar") || lowerMessage.includes("viagem") || lowerMessage.includes("itinerário")) {
       return {
-        type: "CONVERSA_CASUAL",
-        confidence: 0.5,
+        type: "PLANEJAMENTO_INICIAL",
+        confidence: 0.8,
         entities: {},
-        context_needed: [],
-        urgency: "baixa",
+        urgency: "media"
       };
     }
+    
+    if (lowerMessage.includes("mudar") || lowerMessage.includes("alterar") || lowerMessage.includes("modificar")) {
+      return {
+        type: "MODIFICACAO_ITINERARIO",
+        confidence: 0.8,
+        entities: {},
+        urgency: "media"
+      };
+    }
+    
+    if (lowerMessage.includes("onde") || lowerMessage.includes("como") || lowerMessage.includes("quando")) {
+      return {
+        type: "BUSCA_INFORMACOES",
+        confidence: 0.7,
+        entities: {},
+        urgency: "baixa"
+      };
+    }
+    
+    // Default para conversa casual
+    return {
+      type: "CONVERSA_CASUAL",
+      confidence: 0.6,
+      entities: {},
+      urgency: "baixa"
+    };
   }
 
   /**

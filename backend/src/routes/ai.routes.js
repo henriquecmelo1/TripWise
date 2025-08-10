@@ -32,24 +32,8 @@ router.post("/itinerary/optimize", async (req, res) => {
   await aiController.optimizeItinerary(req, res);
 });
 
-router.get("/patterns/:userId", async (req, res) => {
-  await aiController.analyzeBehavioralPatterns(req, res);
-});
-
 router.get("/health", async (req, res) => {
   await aiController.healthCheck(req, res);
-});
-
-router.post("/predictions/pricing", async (req, res) => {
-  await aiController.predictOptimalBookingTime(req, res);
-});
-
-router.post("/predictions/crowds", async (req, res) => {
-  await aiController.predictCrowdLevels(req, res);
-});
-
-router.post("/emergency/support", async (req, res) => {
-  await aiController.handleEmergencySupport(req, res);
 });
 
 router.get("/itinerary/form", (req, res) => {
