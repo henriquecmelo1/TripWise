@@ -7,7 +7,7 @@ class EnvironmentValidator {
   constructor() {
     this.requiredVars = [
       {
-        name: "GOOGLE_GEMINI_API_KEY",
+        name: "GEMINI_API_KEY",
         description: "Chave da API Google Gemini (obrigatória)",
         required: true,
         validator: (value) => value && value.length > 10,
