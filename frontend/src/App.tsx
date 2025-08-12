@@ -4,6 +4,9 @@ import Dashboard from "./pages/Dashboard";
 import Flights from "./pages/Flights";
 import ItineraryPage from "./pages/ItineraryPage";
 import Questionnaire from "./pages/Questionnaire";
+import TravelTips from "./pages/TravelTips";
+import ExploreDestinations from "./pages/ExploreDestinations";
+import DynamicForm from "./components/DynamicForm/DynamicForm";
 import { Routes, Route } from "react-router-dom";
 
 function App() {
@@ -11,9 +14,17 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Dashboard />} />
-        <Route path="/dashboard" element={<Dashboard />} />
         <Route
           path="/forms"
+          element={
+            <>
+              <Navbar />
+              <DynamicForm />
+            </>
+          }
+        />
+        <Route
+          path="/forms-old"
           element={
             <>
               <Navbar />
@@ -38,6 +49,14 @@ function App() {
               <ItineraryPage />
             </>
           }
+        />
+        <Route
+          path="/tips"
+          element={<TravelTips />}
+        />
+        <Route
+          path="/destinations"
+          element={<ExploreDestinations />}
         />
       </Routes>
     </>

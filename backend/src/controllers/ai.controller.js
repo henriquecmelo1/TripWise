@@ -29,6 +29,7 @@ class AIController {
       }
 
       const tripDetails = {
+        departureLocation: formData.departure_location,
         destination: formData.destination,
         duration: this.calculateDuration(
           formData.start_date,

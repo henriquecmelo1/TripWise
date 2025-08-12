@@ -59,6 +59,13 @@ router.get("/itinerary/form", (req, res) => {
       title: "Detalhes da Viagem",
       fields: [
         {
+          id: "departure_location",
+          type: "text",
+          label: "Local de partida",
+          placeholder: "Ex: São Paulo, Brasil",
+          required: true,
+        },
+        {
           id: "destination",
           type: "text",
           label: "Destino",
@@ -179,8 +186,6 @@ router.get("/itinerary/form", (req, res) => {
             { value: "vegano", label: "Vegano" },
             { value: "sem_gluten", label: "Sem glúten" },
             { value: "sem_lactose", label: "Sem lactose" },
-            { value: "halal", label: "Halal" },
-            { value: "kosher", label: "Kosher" },
           ],
         },
         {

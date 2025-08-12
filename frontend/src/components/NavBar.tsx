@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   iconMapMarkerAlt,
-  iconUsers,
   iconCalendar,
   iconStar,
 } from "../assets/icons";
@@ -19,12 +18,6 @@ export default function Navbar() {
   };
 
   const navItems = [
-    {
-      path: "/dashboard",
-      label: "Dashboard",
-      icon: iconUsers,
-      gradient: "from-blue-500 to-indigo-500",
-    },
     {
       path: "/forms",
       label: "Formulário",
@@ -46,18 +39,15 @@ export default function Navbar() {
   ];
 
   const isActive = (path: string) => {
-    if (path === "/dashboard") {
-      return location.pathname === "/" || location.pathname === "/dashboard";
-    }
     return location.pathname === path;
   };
 
   const handleNavigation = (path: string) => {
-    if (path === "/dashboard") {
-      navigate("/", { state: { departureFlights, returnFlights, itinerary } });
-    } else {
-      navigate(path, { state: { departureFlights, returnFlights, itinerary } });
-    }
+    navigate(path, { state: { departureFlights, returnFlights, itinerary } });
+  };
+
+  const handleHomeNavigation = () => {
+    navigate("/", { state: { departureFlights, returnFlights, itinerary } });
   };
 
   return (
@@ -67,7 +57,7 @@ export default function Navbar() {
           {/* Logo e Slogan */}
           <div className="flex items-center mb-4 md:mb-0 group">
             <button
-              onClick={() => handleNavigation("/dashboard")}
+              onClick={handleHomeNavigation}
               className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mr-4 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105"
             >
               Trip Wise

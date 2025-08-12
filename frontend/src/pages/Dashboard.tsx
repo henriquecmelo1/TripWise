@@ -91,13 +91,20 @@ const Dashboard: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
-                Dashboard
-              </h1>
-              <p className="text-gray-600 dark:text-gray-300 mt-1 transition-colors duration-300">
-                Visão geral das suas viagens
-              </p>
+            <div className="flex items-center group">
+              <button
+                onClick={() => navigate("/")}
+                className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105"
+              >
+                TripWise
+              </button>
+              <div className="hidden md:flex items-center text-gray-600 dark:text-gray-300 text-sm lg:text-base transition-colors duration-300 ml-4">
+                <span
+                  className="inline-flex justify-center items-center w-5 h-5 mr-2 text-blue-500 group-hover:animate-bounce"
+                  dangerouslySetInnerHTML={{ __html: iconMapMarkerAlt }}
+                />
+                <span className="font-medium">Sua plataforma inteligente para planejar viagens</span>
+              </div>
             </div>
 
             <div className="flex items-center space-x-4">
