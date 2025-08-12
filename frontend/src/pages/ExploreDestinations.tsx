@@ -6,6 +6,9 @@ import {
   iconCalendar,
   iconDollarSign,
 } from "../assets/icons";
+// BRAVE enrichment agora está integrado diretamente aos itinerários
+// Funcionalidade de "Info Inteligente" removida - dados contextuais 
+// são automaticamente incluídos durante a geração de itinerários
 
 interface Destination {
   id: string;
@@ -36,6 +39,8 @@ const ExploreDestinations: React.FC = () => {
   const [selectedBudget, setSelectedBudget] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
+  // Funcionalidade "Info Inteligente" removida - dados contextuais 
+  // são integrados automaticamente durante geração de itinerários
 
   const continents: FilterOption[] = [
     { id: "all", name: "Todos os Continentes" },
@@ -63,6 +68,8 @@ const ExploreDestinations: React.FC = () => {
     { id: "city", name: "Cidade" },
     { id: "relaxation", name: "Relaxamento" },
   ];
+
+  // Função removida - enrichment contextual agora é automático nos itinerários
 
   const destinations: Destination[] = [
     {
@@ -376,7 +383,7 @@ const ExploreDestinations: React.FC = () => {
               className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
             />
           </div>
-
+          
           {/* Filter Buttons */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Continent Filter */}
@@ -441,6 +448,7 @@ const ExploreDestinations: React.FC = () => {
             {filteredDestinations.length} {filteredDestinations.length === 1 ? 'destino encontrado' : 'destinos encontrados'}
           </p>
         </div>
+
 
         {/* Destinations Grid */}
         {filteredDestinations.length > 0 ? (
@@ -520,7 +528,15 @@ const ExploreDestinations: React.FC = () => {
 
                     {/* Action Button */}
                     <button
-                      onClick={() => navigate("/forms", { state: { destination: destination.name } })}
+                      onClick={() => navigate("/forms", { 
+                        state: { 
+                          preselectedDestination: `${destination.name}, ${destination.country}`,
+                          suggestedBudget: destination.budget,
+                          suggestedTypes: destination.type,
+                          suggestedClimate: destination.climate,
+                          suggestedBestTime: destination.bestTime
+                        }
+                      })}
                       className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105"
                     >
                       Planejar Viagem

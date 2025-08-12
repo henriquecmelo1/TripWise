@@ -1,4 +1,6 @@
 export interface Atividade {
+  nome: string;
+  descricao: string;
   horario: string;
   atividade: string;
   local: string;
@@ -41,6 +43,8 @@ export interface OrcamentoDetalhado {
 }
 
 export interface ItineraryData {
+  destino: string;
+  duracao: string;
   tematicaNarrativa: string;
   resumoExecutivo: string;
   fonteDados: string;

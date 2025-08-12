@@ -143,7 +143,6 @@ export const SkeletonImage: React.FC<{
   />
 );
 
-// Dashboard specific skeletons
 export const SkeletonDashboardCard: React.FC<{ className?: string }> = ({ className = '' }) => (
   <div className={`bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg ${className}`}>
     <div className="flex items-center justify-between mb-4">

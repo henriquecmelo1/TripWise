@@ -1,10 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  iconMapMarkerAlt,
-  iconCalendar,
-  iconStar,
-} from "../assets/icons";
+import { iconMapMarkerAlt, iconCalendar, iconStar } from "../assets/icons";
 import { type Flight } from "../data/flightInterface";
+import logo from "../assets/logo.svg";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -36,6 +33,12 @@ export default function Navbar() {
       icon: iconStar,
       gradient: "from-orange-500 to-red-500",
     },
+    {
+      path: "/my-trips",
+      label: "Minhas Viagens",
+      icon: iconStar,
+      gradient: "from-blue-500 to-cyan-500",
+    },
   ];
 
   const isActive = (path: string) => {
@@ -60,7 +63,7 @@ export default function Navbar() {
               onClick={handleHomeNavigation}
               className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mr-4 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105"
             >
-              Trip Wise
+              <img src={logo} className="h-16 w-48" alt="TripWise Logo" />
             </button>
             <div className="hidden md:flex items-center text-gray-600 dark:text-gray-300 text-sm lg:text-base transition-colors duration-300">
               <span

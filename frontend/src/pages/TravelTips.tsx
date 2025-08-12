@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import logo from "../assets/logo.svg";
 import { useTheme } from "../contexts/ThemeContext";
 import {
   iconLightbulb,
@@ -8,6 +9,9 @@ import {
   iconBriefcase,
   iconUserAccount,
 } from "../assets/icons";
+import destinationsService, {
+  type SmartTip,
+} from "../services/destinationsService";
 
 interface TravelTip {
   id: string;
@@ -27,9 +31,14 @@ interface TipCategory {
 
 const TravelTips: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isDarkMode, toggleTheme } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [smartTips, setSmartTips] = useState<SmartTip[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [selectedDestination, setSelectedDestination] = useState<string>("");
+  const [selectedTravelType, setSelectedTravelType] = useState<string>("");
+  const [selectedBudget, setSelectedBudget] = useState<string>("");
 
   const categories: TipCategory[] = [
     {
@@ -76,33 +85,105 @@ const TravelTips: React.FC = () => {
     },
   ];
 
-  const tips: TravelTip[] = [
+  // Função para buscar dicas inteligentes
+  const fetchSmartTips = async () => {
+    if (!selectedDestination.trim()) return;
+
+    setLoading(true);
+    try {
+      const response = await destinationsService.getSmartTips({
+        destination: selectedDestination,
+        travelType: selectedTravelType || undefined,
+        budget: selectedBudget || undefined,
+        interests: selectedCategory !== "all" ? [selectedCategory] : undefined,
+      });
+
+      if (response.success) {
+        setSmartTips(response.tips);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar dicas inteligentes:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Capturar dados pré-selecionados do ExploreDestinations
+  useEffect(() => {
+    const preselectedData = location.state as any;
+    if (preselectedData) {
+      if (preselectedData.preselectedDestination) {
+        setSelectedDestination(preselectedData.preselectedDestination);
+      }
+      if (preselectedData.suggestedBudget) {
+        // Mapear budget do mockdata para os valores do select
+        const budgetMap: { [key: string]: string } = {
+          low: "low",
+          medium: "medium",
+          high: "high",
+        };
+        setSelectedBudget(budgetMap[preselectedData.suggestedBudget] || "");
+      }
+      if (
+        preselectedData.suggestedTypes &&
+        preselectedData.suggestedTypes.length > 0
+      ) {
+        // Usar o primeiro tipo sugerido
+        const typeMap: { [key: string]: string } = {
+          culture: "cultural",
+          beach: "leisure",
+          adventure: "adventure",
+          nature: "adventure",
+          city: "cultural",
+          relaxation: "leisure",
+        };
+        setSelectedTravelType(typeMap[preselectedData.suggestedTypes[0]] || "");
+      }
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    if (selectedDestination) {
+      fetchSmartTips();
+    }
+  }, [
+    selectedDestination,
+    selectedTravelType,
+    selectedBudget,
+    selectedCategory,
+  ]);
+
+  const staticTips: TravelTip[] = [
     // Segurança
     {
       id: "1",
       title: "Guarde cópias dos documentos",
-      description: "Sempre tenha cópias físicas e digitais dos seus documentos importantes guardadas separadamente.",
+      description:
+        "Sempre tenha cópias físicas e digitais dos seus documentos importantes guardadas separadamente.",
       category: "security",
       important: true,
     },
     {
       id: "2",
       title: "Informe alguém sobre seus planos",
-      description: "Deixe um cronograma detalhado da viagem com familiares ou amigos de confiança.",
+      description:
+        "Deixe um cronograma detalhado da viagem com familiares ou amigos de confiança.",
       category: "security",
       important: true,
     },
     {
       id: "3",
       title: "Use cofres do hotel",
-      description: "Utilize os cofres disponíveis no hotel para guardar objetos de valor e documentos.",
+      description:
+        "Utilize os cofres disponíveis no hotel para guardar objetos de valor e documentos.",
       category: "security",
       important: false,
     },
     {
       id: "4",
       title: "Evite exibir objetos de valor",
-      description: "Não use joias caras ou dispositivos eletrônicos chamativos em locais públicos.",
+      description:
+        "Não use joias caras ou dispositivos eletrônicos chamativos em locais públicos.",
       category: "security",
       important: false,
     },
@@ -111,28 +192,32 @@ const TravelTips: React.FC = () => {
     {
       id: "5",
       title: "Lista de bagagem",
-      description: "Faça uma lista do que está levando e tire fotos da bagagem antes de despachar.",
+      description:
+        "Faça uma lista do que está levando e tire fotos da bagagem antes de despachar.",
       category: "baggage",
       important: true,
     },
     {
       id: "6",
       title: "Medicamentos na bagagem de mão",
-      description: "Sempre carregue medicamentos essenciais na bagagem de mão, nunca despache.",
+      description:
+        "Sempre carregue medicamentos essenciais na bagagem de mão, nunca despache.",
       category: "baggage",
       important: true,
     },
     {
       id: "7",
       title: "Roupas extras no carry-on",
-      description: "Leve uma muda de roupa completa na bagagem de mão em caso de extravio.",
+      description:
+        "Leve uma muda de roupa completa na bagagem de mão em caso de extravio.",
       category: "baggage",
       important: false,
     },
     {
       id: "8",
       title: "Peso e dimensões",
-      description: "Verifique sempre os limites de peso e dimensões da companhia aérea antes de fazer as malas.",
+      description:
+        "Verifique sempre os limites de peso e dimensões da companhia aérea antes de fazer as malas.",
       category: "baggage",
       important: false,
     },
@@ -141,28 +226,32 @@ const TravelTips: React.FC = () => {
     {
       id: "9",
       title: "Validade do passaporte",
-      description: "Verifique se seu passaporte tem pelo menos 6 meses de validade a partir da data da viagem.",
+      description:
+        "Verifique se seu passaporte tem pelo menos 6 meses de validade a partir da data da viagem.",
       category: "documentation",
       important: true,
     },
     {
       id: "10",
       title: "Vistos necessários",
-      description: "Pesquise e providencie todos os vistos necessários com antecedência suficiente.",
+      description:
+        "Pesquise e providencie todos os vistos necessários com antecedência suficiente.",
       category: "documentation",
       important: true,
     },
     {
       id: "11",
       title: "Cartão de vacinação",
-      description: "Mantenha seu cartão de vacinação atualizado e verifique se precisa de vacinas específicas.",
+      description:
+        "Mantenha seu cartão de vacinação atualizado e verifique se precisa de vacinas específicas.",
       category: "documentation",
       important: false,
     },
     {
       id: "12",
       title: "Seguro viagem",
-      description: "Contrate um seguro viagem que cubra emergências médicas e cancelamentos.",
+      description:
+        "Contrate um seguro viagem que cubra emergências médicas e cancelamentos.",
       category: "documentation",
       important: true,
     },
@@ -171,28 +260,32 @@ const TravelTips: React.FC = () => {
     {
       id: "13",
       title: "Kit de primeiros socorros",
-      description: "Monte um kit básico com band-aids, analgésicos, termômetro e medicamentos pessoais.",
+      description:
+        "Monte um kit básico com band-aids, analgésicos, termômetro e medicamentos pessoais.",
       category: "health",
       important: false,
     },
     {
       id: "14",
       title: "Hidratação constante",
-      description: "Beba muita água, especialmente em voos longos e destinos com clima quente.",
+      description:
+        "Beba muita água, especialmente em voos longos e destinos com clima quente.",
       category: "health",
       important: false,
     },
     {
       id: "15",
       title: "Fuso horário",
-      description: "Comece a ajustar seu horário de sono alguns dias antes da viagem para minimizar o jet lag.",
+      description:
+        "Comece a ajustar seu horário de sono alguns dias antes da viagem para minimizar o jet lag.",
       category: "health",
       important: false,
     },
     {
       id: "16",
       title: "Cuidados com alimentação",
-      description: "Tenha cuidado com comida de rua e água não tratada em alguns destinos.",
+      description:
+        "Tenha cuidado com comida de rua e água não tratada em alguns destinos.",
       category: "health",
       important: true,
     },
@@ -201,42 +294,52 @@ const TravelTips: React.FC = () => {
     {
       id: "17",
       title: "Pesquise costumes locais",
-      description: "Aprenda sobre tradições, códigos de vestimenta e etiqueta social do destino.",
+      description:
+        "Aprenda sobre tradições, códigos de vestimenta e etiqueta social do destino.",
       category: "culture",
       important: false,
     },
     {
       id: "18",
       title: "Aprenda frases básicas",
-      description: "Memorize cumprimentos, agradecimentos e pedidos de ajuda no idioma local.",
+      description:
+        "Memorize cumprimentos, agradecimentos e pedidos de ajuda no idioma local.",
       category: "culture",
       important: false,
     },
     {
       id: "19",
       title: "Respeite locais sagrados",
-      description: "Siga as regras de comportamento e vestimenta em templos e locais religiosos.",
+      description:
+        "Siga as regras de comportamento e vestimenta em templos e locais religiosos.",
       category: "culture",
       important: true,
     },
     {
       id: "20",
       title: "Gorjetas e negociação",
-      description: "Entenda as práticas locais sobre gorjetas e pechinchação em mercados.",
+      description:
+        "Entenda as práticas locais sobre gorjetas e pechinchação em mercados.",
       category: "culture",
       important: false,
     },
   ];
 
-  const filteredTips = tips.filter((tip) => {
-    const matchesCategory = selectedCategory === "all" || tip.category === selectedCategory;
-    const matchesSearch = tip.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         tip.description.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+  const filteredStaticTips = staticTips.filter((tip) => {
+    const matchesCategory =
+      selectedCategory === "all" || tip.category === selectedCategory;
+    return matchesCategory;
   });
 
-  const importantTips = filteredTips.filter(tip => tip.important);
-  const regularTips = filteredTips.filter(tip => !tip.important);
+  const filteredSmartTips = smartTips.filter((tip) => {
+    const matchesCategory =
+      selectedCategory === "all" ||
+      tip.category.toLowerCase().includes(selectedCategory);
+    return matchesCategory;
+  });
+
+  const importantTips = filteredStaticTips.filter((tip) => tip.important);
+  const regularTips = filteredStaticTips.filter((tip) => !tip.important);
 
   return (
     <div
@@ -255,14 +358,16 @@ const TravelTips: React.FC = () => {
                 onClick={() => navigate("/")}
                 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105"
               >
-                TripWise
+                <img src={logo} className="h-16 w-48" alt="TripWise Logo" />
               </button>
               <div className="hidden md:flex items-center text-gray-600 dark:text-gray-300 text-sm lg:text-base transition-colors duration-300 ml-4">
                 <span
                   className="inline-flex justify-center items-center w-5 h-5 mr-2 text-blue-500 group-hover:animate-bounce"
                   dangerouslySetInnerHTML={{ __html: iconLightbulb }}
                 />
-                <span className="font-medium">Dicas essenciais para sua viagem</span>
+                <span className="font-medium">
+                  Dicas essenciais para sua viagem
+                </span>
               </div>
             </div>
 
@@ -314,21 +419,46 @@ const TravelTips: React.FC = () => {
             Dicas de Viagem Essenciais 💡
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Prepare-se para uma viagem segura e inesquecível com nossas dicas cuidadosamente selecionadas.
+            Prepare-se para uma viagem segura e inesquecível com nossas dicas
+            cuidadosamente selecionadas.
           </p>
         </div>
 
-        {/* Search Bar */}
-        <div className="mb-8">
-          <div className="max-w-md mx-auto">
-            <input
-              type="text"
-              placeholder="Buscar dicas..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-            />
-          </div>
+        {/* Smart Tips Controls */}
+        <div className="mb-8 space-y-6">
+          {/* Indicador de dados pré-selecionados */}
+          {location.state && (
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-green-800 dark:text-green-200 flex items-center">
+                    ✅{" "}
+                    <strong className="ml-2">
+                      Dados preenchidos automaticamente
+                    </strong>
+                    <span className="ml-2">
+                      a partir do destino selecionado!
+                    </span>
+                  </p>
+                  <button
+                    onClick={() =>
+                      navigate("/forms", {
+                        state: {
+                          preselectedDestination: selectedDestination,
+                          suggestedBudget: selectedBudget,
+                          suggestedTravelType: selectedTravelType,
+                        },
+                      })
+                    }
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
+                  >
+                    🗺️ Criar Itinerário
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
 
         {/* Category Filters */}
@@ -356,6 +486,58 @@ const TravelTips: React.FC = () => {
           </div>
         </div>
 
+        {/* Smart Tips Section */}
+        {filteredSmartTips.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+              <span className="bg-blue-100 dark:bg-blue-900 p-2 rounded-lg mr-3">
+                🤖
+              </span>
+              Dicas Inteligentes para {selectedDestination}
+              {loading && (
+                <div className="ml-3 animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              )}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredSmartTips.map((tip, index) => (
+                <div
+                  key={index}
+                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-l-4 border-blue-500"
+                >
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {tip.title}
+                      </h3>
+                      <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full text-xs font-medium">
+                        {tip.category}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                      {tip.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        Fonte: {tip.source}
+                      </span>
+                      {tip.url && (
+                        <a
+                          href={tip.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
+                        >
+                          Ver mais →
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Important Tips Section */}
         {importantTips.length > 0 && (
           <div className="mb-12">
@@ -367,7 +549,9 @@ const TravelTips: React.FC = () => {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {importantTips.map((tip) => {
-                const category = categories.find(cat => cat.id === tip.category);
+                const category = categories.find(
+                  (cat) => cat.id === tip.category
+                );
                 return (
                   <div
                     key={tip.id}
@@ -415,7 +599,9 @@ const TravelTips: React.FC = () => {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {regularTips.map((tip) => {
-                const category = categories.find(cat => cat.id === tip.category);
+                const category = categories.find(
+                  (cat) => cat.id === tip.category
+                );
                 return (
                   <div
                     key={tip.id}
@@ -448,14 +634,16 @@ const TravelTips: React.FC = () => {
         )}
 
         {/* No Results */}
-        {filteredTips.length === 0 && (
+        {filteredStaticTips.length === 0 && filteredSmartTips.length === 0 && (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🔍</div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               Nenhuma dica encontrada
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Tente ajustar seus filtros ou buscar por outros termos.
+              {selectedDestination
+                ? "Tente ajustar seus filtros ou buscar por outros termos."
+                : "Digite um destino para obter dicas inteligentes personalizadas."}
             </p>
           </div>
         )}

@@ -1,11 +1,12 @@
 import "./App.css";
 import Navbar from "./components/NavBar";
-import Dashboard from "./pages/Dashboard";
+import Home from "./pages/Home";
 import Flights from "./pages/Flights";
 import ItineraryPage from "./pages/ItineraryPage";
 import Questionnaire from "./pages/Questionnaire";
 import TravelTips from "./pages/TravelTips";
 import ExploreDestinations from "./pages/ExploreDestinations";
+import MyTrips from "./pages/MyTrips";
 import DynamicForm from "./components/DynamicForm/DynamicForm";
 import { Routes, Route } from "react-router-dom";
 
@@ -13,7 +14,7 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Home />} />
         <Route
           path="/forms"
           element={
@@ -57,6 +58,15 @@ function App() {
         <Route
           path="/destinations"
           element={<ExploreDestinations />}
+        />
+        <Route
+          path="/my-trips"
+          element={
+            <>
+              <Navbar />
+              <MyTrips />
+            </>
+          }
         />
       </Routes>
     </>

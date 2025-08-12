@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
+import logo from "../assets/logo.svg"
 import {
   iconMapMarkerAlt,
   iconUsers,
@@ -17,10 +18,9 @@ interface QuickAction {
   gradient: string;
 }
 
-const Dashboard: React.FC = () => {
+const Home: React.FC = () => {
   const navigate = useNavigate();
   const { isDarkMode, toggleTheme } = useTheme();
-  const [isLoading, setIsLoading] = useState(true);
 
   const quickActions: QuickAction[] = [
     {
@@ -57,28 +57,6 @@ const Dashboard: React.FC = () => {
     },
   ];
 
-  // Simular carregamento inicial
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Theme toggle is now handled by the context
-
-  const SkeletonCard = () => (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg animate-pulse">
-      <div className="flex items-center justify-between mb-4">
-        <div className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
-        <div className="w-16 h-4 bg-gray-300 dark:bg-gray-600 rounded"></div>
-      </div>
-      <div className="w-32 h-6 bg-gray-300 dark:bg-gray-600 rounded mb-2"></div>
-      <div className="w-40 h-4 bg-gray-300 dark:bg-gray-600 rounded"></div>
-    </div>
-  );
-
   return (
     <div
       className={`min-h-screen w-full transition-colors duration-300 ${
@@ -87,7 +65,6 @@ const Dashboard: React.FC = () => {
           : "bg-gradient-to-br from-blue-50 via-white to-indigo-50"
       }`}
     >
-      {/* Header com toggle de modo escuro */}
       <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
@@ -96,14 +73,16 @@ const Dashboard: React.FC = () => {
                 onClick={() => navigate("/")}
                 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105"
               >
-                TripWise
+                <img src={logo} className="h-16 w-48" alt="TripWise Logo" />
               </button>
               <div className="hidden md:flex items-center text-gray-600 dark:text-gray-300 text-sm lg:text-base transition-colors duration-300 ml-4">
                 <span
                   className="inline-flex justify-center items-center w-5 h-5 mr-2 text-blue-500 group-hover:animate-bounce"
                   dangerouslySetInnerHTML={{ __html: iconMapMarkerAlt }}
                 />
-                <span className="font-medium">Sua plataforma inteligente para planejar viagens</span>
+                <span className="font-medium">
+                  Sua plataforma inteligente para planejar viagens
+                </span>
               </div>
             </div>
 
@@ -160,33 +139,27 @@ const Dashboard: React.FC = () => {
           </p>
         </div>
 
-        {/* Cards de Ações Rápidas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {isLoading
-            ? Array.from({ length: 4 }).map((_, index) => (
-                <SkeletonCard key={index} />
-              ))
-            : quickActions.map((action) => (
-                <button
-                  key={action.id}
-                  onClick={() => navigate(action.route)}
-                  className={`bg-gradient-to-r ${action.gradient} hover:scale-105 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-left`}
-                >
-                  <div className="flex items-center mb-4">
-                    <div className="p-3 bg-white bg-opacity-20 rounded-full">
-                      <span
-                        className="text-white text-xl"
-                        dangerouslySetInnerHTML={{ __html: action.icon }}
-                      />
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">{action.title}</h3>
-                  <p className="text-sm opacity-90">{action.description}</p>
-                </button>
-              ))}
+          {quickActions.map((action) => (
+            <button
+              key={action.id}
+              onClick={() => navigate(action.route)}
+              className={`bg-gradient-to-r ${action.gradient} hover:scale-105 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-left`}
+            >
+              <div className="flex items-center mb-4">
+                <div className="p-3 bg-white bg-opacity-20 rounded-full">
+                  <span
+                    className="text-white text-xl"
+                    dangerouslySetInnerHTML={{ __html: action.icon }}
+                  />
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">{action.title}</h3>
+              <p className="text-sm opacity-90">{action.description}</p>
+            </button>
+          ))}
         </div>
 
-        {/* Seção de Recursos */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
             Como o TripWise pode te ajudar?
@@ -246,4 +219,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default Home;
