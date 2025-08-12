@@ -1,4 +1,3 @@
-// src/components/Itinerary/DailyItinerarySection.tsx
 import { type ItinerarioDiario } from '../../data/itineraryInterface'; // Importa a interface
 import DayCard from './DayCard'; 
 

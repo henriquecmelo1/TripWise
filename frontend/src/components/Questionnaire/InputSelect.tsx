@@ -18,8 +18,9 @@ export default function InputSelect({ label, icon, placeholder, options, value, 
   return (
     <FormGroup label={label} icon={icon}>
       <select
-        className="w-full p-3 border border-gray-300 rounded-md text-base bg-white
-                   appearance-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md text-base
+                   bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                   appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >

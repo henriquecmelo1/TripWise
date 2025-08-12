@@ -13,8 +13,9 @@ export default function InputText({ label, placeholder, icon, value, onChange }:
     <FormGroup label={label} icon={icon}>
       <input
         type="text"
-        className="w-full p-3 border border-gray-300 rounded-md text-base
-                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md text-base
+                   bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}

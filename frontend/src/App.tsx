@@ -1,23 +1,47 @@
-import './App.css'
-import Navbar from './components/NavBar'
-import Flights from './pages/Flights'
-import ItineraryPage from './pages/ItineraryPage'
-import Questionnaire from './pages/Questionnaire'
-import { Routes, Route } from 'react-router-dom'
+import "./App.css";
+import Navbar from "./components/NavBar";
+import Dashboard from "./pages/Dashboard";
+import Flights from "./pages/Flights";
+import ItineraryPage from "./pages/ItineraryPage";
+import Questionnaire from "./pages/Questionnaire";
+import { Routes, Route } from "react-router-dom";
 
 function App() {
-
-  return (<>
-    <Navbar></Navbar>
-    <Routes>
-      <Route path='/' element={<Questionnaire />} />
-      <Route path='/forms' element={<Questionnaire />} />
-      <Route path='/flights' element={<Flights />} />
-      <Route path='/itinerary' element={<ItineraryPage />} />
-
-    </Routes>
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/forms"
+          element={
+            <>
+              <Navbar />
+              <Questionnaire />
+            </>
+          }
+        />
+        <Route
+          path="/flights"
+          element={
+            <>
+              <Navbar />
+              <Flights />
+            </>
+          }
+        />
+        <Route
+          path="/itinerary"
+          element={
+            <>
+              <Navbar />
+              <ItineraryPage />
+            </>
+          }
+        />
+      </Routes>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

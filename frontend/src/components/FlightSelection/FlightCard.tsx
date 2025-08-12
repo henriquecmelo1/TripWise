@@ -1,4 +1,3 @@
-// src/components/FlightSelection/FlightCard.tsx
 import { type Flight } from "../../data/flightInterface";
 import { planeIcon, clockIcon } from "../../assets/icons"; // Importa a interface Flight e ícones genéricos
 
@@ -19,7 +18,7 @@ export default function FlightCard({ flight }: FlightCardProps) {
   };
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md mb-4 flex items-center">
+    <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md mb-4 flex items-center">
       {/* Coluna 1: Companhia Aérea e Número do Voo */}
       {/* w-20 para uma largura fixa, text-center para centralizar conteúdo */}
       <div className="flex-shrink-0 w-20 text-center mr-4">
@@ -29,10 +28,10 @@ export default function FlightCard({ flight }: FlightCardProps) {
           dangerouslySetInnerHTML={{ __html: planeIcon }}
         />
         {/* Mostra só a primeira palavra da companhia aérea (ex: GOL, LATAM) */}
-        <p className="text-sm font-semibold text-gray-700">
+        <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">
           {flight.companhiaAerea.split(" ")[0]}
         </p>
-        <p className="text-xs text-gray-500">Voo {flight.numeroVoo}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">Voo {flight.numeroVoo}</p>
       </div>
 
       {/* Coluna 2: Detalhes do Voo (Horários, Duração, Origem e Destino) */}
@@ -43,16 +42,16 @@ export default function FlightCard({ flight }: FlightCardProps) {
         <div className="flex items-center justify-center mb-1">
           {/* Horário de Partida com Data */}
           <div className="text-center">
-            <p className="text-xl font-bold text-gray-800">
+            <p className="text-xl font-bold text-gray-800 dark:text-gray-100">
               {getHour(flight.dataHoraPartida)}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               {getDate(flight.dataHoraPartida)}
             </p>
           </div>
 
           {/* Duração no meio */}
-          <div className="flex items-center text-gray-500 text-sm mx-4">
+          <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm mx-4">
             <span
               className="inline-flex justify-center items-center w-4 h-4 mr-1"
               dangerouslySetInnerHTML={{ __html: clockIcon }}
@@ -62,10 +61,10 @@ export default function FlightCard({ flight }: FlightCardProps) {
 
           {/* Horário de Chegada com Data */}
           <div className="text-center">
-            <p className="text-xl font-bold text-gray-800">
+            <p className="text-xl font-bold text-gray-800 dark:text-gray-100">
               {getHour(flight.dataHoraChegada)}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               {getDate(flight.dataHoraChegada)}
             </p>
           </div>
@@ -74,22 +73,22 @@ export default function FlightCard({ flight }: FlightCardProps) {
         {/* Linha Inferior: Aeroportos de Origem e Destino com Seta */}
         {/* justify-between para empurrar aeroportos para as pontas */}
         <div className="flex items-center justify-center">
-          <p className="text-sm text-gray-500">{flight.origem}</p>
-          <span className="text-gray-400 text-lg mx-2">→</span>{" "}
+          <p className="text-sm text-gray-500 dark:text-gray-400">{flight.origem}</p>
+          <span className="text-gray-400 dark:text-gray-500 text-lg mx-2">→</span>{" "}
           {/* Seta como separador */}
-          <p className="text-sm text-gray-500">{flight.destino}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{flight.destino}</p>
         </div>
       </div>
 
       {/* Coluna 3: Preços */}
       {/* ml-4 para margem esquerda, text-right para alinhar texto à direita, min-w-[120px] para garantir espaço mínimo */}
       <div className="flex-shrink-0 ml-4 text-right min-w-[150px]">
-        <p className="text-xl font-bold text-blue-600">{flight.precoTotal}</p>
+        <p className="text-xl font-bold text-blue-600 dark:text-blue-400">{flight.precoTotal}</p>
         {flight.precoAdulto && (
-          <p className="text-xs text-gray-500">Passagem Adulto: {flight.precoAdulto}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Passagem Adulto: {flight.precoAdulto}</p>
         )}
         {flight.precoCrianca != 'N/A'&& (
-          <p className="text-xs text-gray-500">Passagem Criança: {flight.precoCrianca}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Passagem Criança: {flight.precoCrianca}</p>
         )}
 
       </div>

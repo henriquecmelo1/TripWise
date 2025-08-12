@@ -1,4 +1,3 @@
-// src/components/Questionnaire/InputDate.tsx
 import FormGroup from './FormGroup'; // Reutiliza o FormGroup, assim como InputText faz
 
 interface DateInputProps {
@@ -32,9 +31,10 @@ export default function InputDate({
         max={maxDate}
         placeholder={placeholderText} // Pode não ser totalmente funcional no type="date"
         // Classes Tailwind idênticas às do InputText para consistência visual
-        className="w-full p-3 border border-gray-300 rounded-md text-base
-                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
-                   text-gray-800 placeholder:text-gray-400"
+        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md text-base
+                   bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                   placeholder:text-gray-400 dark:placeholder:text-gray-500"
       />
     </FormGroup>
   );
