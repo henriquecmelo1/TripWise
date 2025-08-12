@@ -34,7 +34,6 @@ import {
   experienceTypeOptions,
 } from "../data/questionnaireOptions";
 import { useNavigate } from "react-router-dom";
-import { buildApiUrl, API_CONFIG } from '../constants/api';
 import ToggleSwitch from "../components/Questionnaire/ToggleSwitch";
 
 export default function Questionnaire() {
@@ -118,13 +117,9 @@ export default function Questionnaire() {
     );
 
     const formData = {
-      // origem,
       destination: destino,
       start_date: dataIda,
       end_date: dataVolta,
-      // numAdultos,
-      // numCriancas,
-      // numBebes,
       travelers_count: totalViajantes,
       trip_type: tipoViagem,
       budget_range: orcamento,
@@ -162,79 +157,28 @@ export default function Questionnaire() {
 
     try {
       if (agendarVoo) {
-        const [departureResponse, returnResponse, itineraryResponse] =
-          await Promise.all([
-            fetch(buildApiUrl("/flights/search"), {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(departureFlightData),
-            }),
-            fetch(buildApiUrl("/flights/search"), {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(returnFlightData),
-            }),
-            fetch(buildApiUrl(API_CONFIG.ENDPOINTS.AI.GENERATE_ITINERARY), {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(dataToSend),
-            }),
-          ]);
-        if (
-          !departureResponse.ok ||
-          !returnResponse.ok ||
-          !itineraryResponse.ok
-        ) {
-          const errorData = await itineraryResponse.json();
-          throw new Error(
-            errorData.message || `Erro do servidor: ${itineraryResponse.status}`
-          );
-        }
-        const departureData = await departureResponse.json();
-        const returnData = await returnResponse.json();
-        const itineraryData = await itineraryResponse.json();
-
-        navigate("/flights", {
+        // Redirect to loading page to handle API calls
+        navigate("/generating", {
           state: {
-            departureFlights: departureData,
-            returnFlights: returnData,
-            itinerary: itineraryData,
+            agendarVoo: true,
+            dataToSend,
+            departureFlightData,
+            returnFlightData,
           },
         });
       } else {
-        const itineraryResponse = await fetch(
-          buildApiUrl(API_CONFIG.ENDPOINTS.AI.GENERATE_ITINERARY),
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(dataToSend),
-          }
-        );
-        if (!itineraryResponse.ok) {
-          const errorData = await itineraryResponse.json();
-          throw new Error(
-            errorData.message || `Erro do servidor: ${itineraryResponse.status}`
-          );
-        }
-        const itineraryData = await itineraryResponse.json();
-        navigate("/itinerary", {
+        // Only itinerary generation
+        navigate("/generating", {
           state: {
-            itinerary: itineraryData,
+            agendarVoo: false,
+            dataToSend,
           },
         });
       }
     } catch (err) {
-      console.error("Erro ao enviar o formulário:", err);
+      console.error("Erro ao iniciar a geração do roteiro:", err);
       setError(
-        `Falha ao gerar roteiros: ${
+        `Falha ao iniciar a geração: ${
           err instanceof Error ? err.message : "Erro desconhecido"
         }`
       );

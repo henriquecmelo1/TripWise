@@ -45,9 +45,6 @@ export default function Navbar() {
     return location.pathname === path;
   };
 
-  const handleNavigation = (path: string) => {
-    navigate(path, { state: { departureFlights, returnFlights, itinerary } });
-  };
 
   const handleHomeNavigation = () => {
     navigate("/", { state: { departureFlights, returnFlights, itinerary } });

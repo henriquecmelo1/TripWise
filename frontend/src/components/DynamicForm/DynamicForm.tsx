@@ -16,9 +16,9 @@ import {
   iconCalendar,
   iconClock,
 } from '../../assets/icons';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ToggleSwitch from '../Questionnaire/ToggleSwitch';
-import { buildApiUrl, API_CONFIG } from '../../constants/api';
+// removed unused API constants after redirecting generation logic to loading page
 
 interface FormData {
   [key: string]: string | string[] | number | null;
@@ -43,44 +43,11 @@ const iconMap: { [key: string]: any } = {
 export default function DynamicForm() {
   const { formStructure, isLoading: formLoading, error: formError } = useFormData();
   const { isDarkMode, toggleTheme } = useTheme();
-  const location = useLocation();
   const [formData, setFormData] = useState<FormData>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [agendarVoo, setAgendarVoo] = useState<boolean>(false);
   const navigate = useNavigate();
-
-  // Capturar dados pré-selecionados
-  React.useEffect(() => {
-    const preselectedData = location.state as any;
-    if (preselectedData) {
-      const updatedFormData: FormData = { ...formData };
-      
-      if (preselectedData.preselectedDestination) {
-        updatedFormData.destination = preselectedData.preselectedDestination;
-      }
-      if (preselectedData.suggestedBudget) {
-        // Mapear budget para os valores esperados pelo DynamicForm
-        const budgetMap: { [key: string]: string } = {
-          'low': 'economico',
-          'medium': 'moderado', 
-          'high': 'alto'
-        };
-        updatedFormData.budget_range = budgetMap[preselectedData.suggestedBudget] || '';
-      }
-      if (preselectedData.suggestedTravelType) {
-        const typeMap: { [key: string]: string } = {
-          'cultural': 'cultural',
-          'adventure': 'aventura',
-          'leisure': 'lazer',
-          'business': 'negocios'
-        };
-        updatedFormData.trip_type = typeMap[preselectedData.suggestedTravelType] || '';
-      }
-      
-      setFormData(updatedFormData);
-    }
-  }, [formData, location.state]);
 
   const handleFieldChange = (fieldId: string, value: string | string[] | number | null) => {
     setFormData(prev => ({
@@ -152,60 +119,27 @@ export default function DynamicForm() {
           max: 3,
         };
 
-        const [departureResponse, returnResponse, itineraryResponse] = await Promise.all([
-          fetch(buildApiUrl("/flights/search"), {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(departureFlightData),
-          }),
-          fetch(buildApiUrl("/flights/search"), {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(returnFlightData),
-          }),
-          fetch(buildApiUrl(API_CONFIG.ENDPOINTS.AI.GENERATE_ITINERARY), {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dataToSend),
-          }),
-        ]);
-
-        if (!departureResponse.ok || !returnResponse.ok || !itineraryResponse.ok) {
-          const errorData = await itineraryResponse.json();
-          throw new Error(errorData.message || `Erro do servidor: ${itineraryResponse.status}`);
-        }
-
-        const departureData = await departureResponse.json();
-        const returnData = await returnResponse.json();
-        const itineraryData = await itineraryResponse.json();
-
-        navigate("/flights", {
+        // Redirect to loading/generating page which will handle requests and navigation
+        navigate("/generating", {
           state: {
-            departureFlights: departureData,
-            returnFlights: returnData,
-            itinerary: itineraryData,
+            agendarVoo: true,
+            dataToSend,
+            departureFlightData,
+            returnFlightData,
           },
         });
       } else {
-        const itineraryResponse = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.AI.GENERATE_ITINERARY), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(dataToSend),
-        });
-
-        if (!itineraryResponse.ok) {
-          const errorData = await itineraryResponse.json();
-          throw new Error(errorData.message || `Erro do servidor: ${itineraryResponse.status}`);
-        }
-
-        const itineraryData = await itineraryResponse.json();
-        navigate("/itinerary", {
-          state: { itinerary: itineraryData },
+        // Only itinerary generation
+        navigate("/generating", {
+          state: {
+            agendarVoo: false,
+            dataToSend,
+          },
         });
       }
     } catch (err) {
-      console.error("Erro ao enviar o formulário:", err);
-      setError(`Falha ao gerar roteiros: ${err instanceof Error ? err.message : "Erro desconhecido"}`);
+      console.error("Erro ao iniciar a geração do roteiro:", err);
+      setError(`Falha ao iniciar a geração: ${err instanceof Error ? err.message : "Erro desconhecido"}`);
     } finally {
       setIsLoading(false);
     }
@@ -351,19 +285,6 @@ export default function DynamicForm() {
           </div>
         </div>
       </div>
-
-      {/* Indicador de dados pré-selecionados */}
-      {location.state && (
-        <div className="max-w-xl mx-auto mt-8 mb-4">
-          
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-            <p className="text-sm text-green-800 dark:text-green-200 flex items-center justify-center">
-              ✅ <strong className="ml-2">Formulário preenchido automaticamente</strong> 
-              <span className="ml-2">com dados do destino selecionado!</span>
-            </p>
-          </div>
-        </div>
-      )}
 
       <div className="max-w-xl mx-auto p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg my-12 transition-colors duration-300">
         <Header />

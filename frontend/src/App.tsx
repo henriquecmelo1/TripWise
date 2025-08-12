@@ -8,6 +8,7 @@ import ExploreDestinations from "./pages/ExploreDestinations";
 import MyTrips from "./pages/MyTrips";
 import DynamicForm from "./components/DynamicForm/DynamicForm";
 import { Routes, Route } from "react-router-dom";
+import Generating from "./pages/Generating";
 
 function App() {
   return (
@@ -20,6 +21,15 @@ function App() {
             <>
               <Navbar />
               <DynamicForm />
+            </>
+          }
+        />
+        <Route
+          path="/generating"
+          element={
+            <>
+              <Navbar />
+              <Generating />
             </>
           }
         />
