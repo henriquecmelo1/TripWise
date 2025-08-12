@@ -425,69 +425,18 @@ class UserPersonalizationEngine {
     return recommendations;
   }
 
-  filterByBudget(recommendations, budget) {
-    // Implementa lógica de filtro por orçamento
-    // Em implementação real, integraria com dados de preços
-  }
-
   /**
    * Aplica restrições e sensibilidades
    */
   applyRestrictions(recommendations, sensitivities) {
-    // Remove itens que conflitam com sensibilidades do usuário
     sensitivities.forEach((sensitivity) => {
-      // Lógica para filtrar baseado em sensibilidades
+      // Remove recomendações que conflitam com sensibilidades do usuário
+      Object.keys(recommendations).forEach((category) => {
+        recommendations[category] = recommendations[category].filter(
+          (item) => !item.toLowerCase().includes(sensitivity.toLowerCase())
+        );
+      });
     });
-  }
-
-  analyzeBehavioralPatterns(userId) {
-    const profile = this.userProfiles.get(userId);
-    if (!profile) return null;
-
-    const patterns = {
-      preferredTimeOfDay: this.analyzeTimePreferences(profile),
-      budgetPatterns: this.analyzeBudgetBehavior(profile),
-      activityPreferences: this.analyzeActivityPatterns(profile),
-      socialBehavior: this.analyzeSocialPatterns(profile),
-    };
-
-    this.behavioralPatterns.set(userId, patterns);
-    return patterns;
-  }
-
-  analyzeTimePreferences(profile) {
-    // Analisa dados históricos para identificar padrões temporais
-    return {
-      morningPerson: true, // Baseado em dados de interação
-      preferredStartTime: profile.preferences.timing.preferredTimeToStart,
-      activityPace: profile.preferences.timing.pacePreference,
-    };
-  }
-
-  analyzeBudgetBehavior(profile) {
-    return {
-      budgetCategory: profile.budget,
-      flexibilityLevel: "medium", // Calculado baseado em escolhas passadas
-      priorityAreas: ["accommodation", "food"], // Onde gasta mais
-    };
-  }
-
-  analyzeActivityPatterns(profile) {
-    return {
-      mostCommonActivities: profile.preferences.activities.slice(0, 3),
-      avoidedActivities: profile.sensitivities,
-      newExperienceOpenness:
-        profile.travelStyle === "spontaneous" ? "high" : "medium",
-    };
-  }
-
-  analyzeSocialPatterns(profile) {
-    return {
-      groupSizePreference: profile.preferences.social.groupSize,
-      interactionLevel: profile.preferences.social.interactionLevel,
-      guidedVsIndependent:
-        profile.travelStyle === "structured" ? "guided" : "independent",
-    };
   }
 }
 
