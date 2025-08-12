@@ -34,6 +34,7 @@ import {
   experienceTypeOptions,
 } from "../data/questionnaireOptions";
 import { useNavigate } from "react-router-dom";
+import { buildApiUrl, API_CONFIG } from '../constants/api';
 import ToggleSwitch from "../components/Questionnaire/ToggleSwitch";
 
 export default function Questionnaire() {
@@ -163,21 +164,21 @@ export default function Questionnaire() {
       if (agendarVoo) {
         const [departureResponse, returnResponse, itineraryResponse] =
           await Promise.all([
-            fetch("http://localhost:3000/flights/search", {
+            fetch(buildApiUrl("/flights/search"), {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify(departureFlightData),
             }),
-            fetch("http://localhost:3000/flights/search", {
+            fetch(buildApiUrl("/flights/search"), {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify(returnFlightData),
             }),
-            fetch("http://localhost:3000/api/ai/itinerary/generate", {
+            fetch(buildApiUrl(API_CONFIG.ENDPOINTS.AI.GENERATE_ITINERARY), {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -208,7 +209,7 @@ export default function Questionnaire() {
         });
       } else {
         const itineraryResponse = await fetch(
-          "http://localhost:3000/api/ai/itinerary/generate",
+          buildApiUrl(API_CONFIG.ENDPOINTS.AI.GENERATE_ITINERARY),
           {
             method: "POST",
             headers: {

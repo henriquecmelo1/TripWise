@@ -63,9 +63,20 @@ export interface PersonalizedFor {
   confidence: number;
 }
 
+interface TripDetails {
+  destination: string;
+  departureLocation: string;
+  duration: number;
+  startDate: string;
+  endDate: string;
+  tripType: string;
+}
+
 export interface BackendItineraryResponse {
+  preferences: any;
   success: boolean;
   itinerary: ItineraryData;
+  tripDetails: TripDetails;
   personalizedFor: PersonalizedFor;
   generatedAt: string; // ISO string, e.g., "2025-07-31T23:59:00Z"
   recommendation: string;

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { buildApiUrl } from '../constants/api';
 
 interface FormField {
   id: string;
@@ -34,7 +35,7 @@ export const useFormData = () => {
     const fetchFormStructure = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('http://localhost:3000/api/ai/itinerary/form');
+        const response = await fetch(buildApiUrl('/api/ai/itinerary/form'));
         
         if (!response.ok) {
           throw new Error(`Erro ao carregar formulário: ${response.status}`);

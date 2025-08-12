@@ -18,6 +18,7 @@ import {
 } from '../../assets/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ToggleSwitch from '../Questionnaire/ToggleSwitch';
+import { buildApiUrl, API_CONFIG } from '../../constants/api';
 
 interface FormData {
   [key: string]: string | string[] | number | null;
@@ -80,7 +81,7 @@ export default function DynamicForm() {
       
       setFormData(updatedFormData);
     }
-  }, [formData, location.state]);
+  }, [location.state]);
 
   const handleFieldChange = (fieldId: string, value: string | string[] | number | null) => {
     setFormData(prev => ({
@@ -154,17 +155,17 @@ export default function DynamicForm() {
         };
 
         const [departureResponse, returnResponse, itineraryResponse] = await Promise.all([
-          fetch("http://localhost:3000/flights/search", {
+          fetch(buildApiUrl("/flights/search"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(departureFlightData),
           }),
-          fetch("http://localhost:3000/flights/search", {
+          fetch(buildApiUrl("/flights/search"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(returnFlightData),
           }),
-          fetch("http://localhost:3000/api/ai/itinerary/generate", {
+          fetch(buildApiUrl(API_CONFIG.ENDPOINTS.AI.GENERATE_ITINERARY), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(dataToSend),
@@ -188,7 +189,7 @@ export default function DynamicForm() {
           },
         });
       } else {
-        const itineraryResponse = await fetch("http://localhost:3000/api/ai/itinerary/generate", {
+        const itineraryResponse = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.AI.GENERATE_ITINERARY), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(dataToSend),

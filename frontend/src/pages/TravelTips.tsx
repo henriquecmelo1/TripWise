@@ -9,10 +9,6 @@ import {
   iconBriefcase,
   iconUserAccount,
 } from "../assets/icons";
-import destinationsService, {
-  type SmartTip,
-} from "../services/destinationsService";
-
 interface TravelTip {
   id: string;
   title: string;
@@ -34,8 +30,8 @@ const TravelTips: React.FC = () => {
   const location = useLocation();
   const { isDarkMode, toggleTheme } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [smartTips, setSmartTips] = useState<SmartTip[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [smartTips] = useState<TravelTip[]>([]);
+  const [loading] = useState<boolean>(false);
   const [selectedDestination, setSelectedDestination] = useState<string>("");
   const [selectedTravelType, setSelectedTravelType] = useState<string>("");
   const [selectedBudget, setSelectedBudget] = useState<string>("");
@@ -85,32 +81,9 @@ const TravelTips: React.FC = () => {
     },
   ];
 
-  // Função para buscar dicas inteligentes
-  const fetchSmartTips = async () => {
-    if (!selectedDestination.trim()) return;
 
-    setLoading(true);
-    try {
-      const response = await destinationsService.getSmartTips({
-        destination: selectedDestination,
-        travelType: selectedTravelType || undefined,
-        budget: selectedBudget || undefined,
-        interests: selectedCategory !== "all" ? [selectedCategory] : undefined,
-      });
-
-      if (response.success) {
-        setSmartTips(response.tips);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar dicas inteligentes:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Capturar dados pré-selecionados do ExploreDestinations
   useEffect(() => {
-    const preselectedData = location.state as any;
+    const preselectedData = location.state;
     if (preselectedData) {
       if (preselectedData.preselectedDestination) {
         setSelectedDestination(preselectedData.preselectedDestination);
@@ -144,7 +117,7 @@ const TravelTips: React.FC = () => {
 
   useEffect(() => {
     if (selectedDestination) {
-      fetchSmartTips();
+      // fetchSmartTips(); // TODO: Implement this function
     }
   }, [
     selectedDestination,
@@ -331,7 +304,7 @@ const TravelTips: React.FC = () => {
     return matchesCategory;
   });
 
-  const filteredSmartTips = smartTips.filter((tip) => {
+  const filteredSmartTips = smartTips.filter((tip: TravelTip) => {
     const matchesCategory =
       selectedCategory === "all" ||
       tip.category.toLowerCase().includes(selectedCategory);
@@ -518,18 +491,8 @@ const TravelTips: React.FC = () => {
                     </p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-500 dark:text-gray-400">
-                        Fonte: {tip.source}
+                        Dica valiosa para sua viagem
                       </span>
-                      {tip.url && (
-                        <a
-                          href={tip.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
-                        >
-                          Ver mais →
-                        </a>
-                      )}
                     </div>
                   </div>
                 </div>
