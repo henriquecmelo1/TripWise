@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface ItineraryHistoryItem {
   id: string;
@@ -25,7 +25,18 @@ export const useItineraryHistory = () => {
     }
   }, []);
 
-  const addToHistory = (itinerary: Omit<ItineraryHistoryItem, 'id' | 'createdAt'>) => {
+  const addToHistory = useCallback((itinerary: Omit<ItineraryHistoryItem, 'id' | 'createdAt'>) => {
+    // Check if this itinerary already exists in history to avoid duplicates
+    const existingItem = history.find(item => 
+      item.title === itinerary.title && 
+      item.destination === itinerary.destination &&
+      JSON.stringify(item.data) === JSON.stringify(itinerary.data)
+    );
+    
+    if (existingItem) {
+      return; // Don't add duplicate
+    }
+
     const newHistoryItem: ItineraryHistoryItem = {
       ...itinerary,
       id: Date.now().toString(),
@@ -36,7 +47,7 @@ export const useItineraryHistory = () => {
     const updatedHistory = [newHistoryItem, ...history].slice(0, 50);
     setHistory(updatedHistory);
     localStorage.setItem('tripwise-history', JSON.stringify(updatedHistory));
-  };
+  }, [history]);
 
   const removeFromHistory = (id: string) => {
     const updatedHistory = history.filter(item => item.id !== id);

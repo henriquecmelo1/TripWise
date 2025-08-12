@@ -82,7 +82,7 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({ className = '' }) => {
           Seus itinerários gerados aparecerão aqui automaticamente
         </p>
         <button
-          onClick={() => navigate('/questionnaire')}
+          onClick={() => navigate('/forms')}
           className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
         >
           Criar Primeiro Itinerário

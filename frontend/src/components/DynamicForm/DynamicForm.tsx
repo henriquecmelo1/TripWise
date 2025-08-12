@@ -69,7 +69,6 @@ export default function DynamicForm() {
         updatedFormData.budget_range = budgetMap[preselectedData.suggestedBudget] || '';
       }
       if (preselectedData.suggestedTravelType) {
-        // Mapear tipo de viagem
         const typeMap: { [key: string]: string } = {
           'cultural': 'cultural',
           'adventure': 'aventura',
@@ -81,7 +80,7 @@ export default function DynamicForm() {
       
       setFormData(updatedFormData);
     }
-  }, [location.state]);
+  }, [formData, location.state]);
 
   const handleFieldChange = (fieldId: string, value: string | string[] | number | null) => {
     setFormData(prev => ({
@@ -109,13 +108,12 @@ export default function DynamicForm() {
     setIsLoading(true);
     setError(null);
 
-    // Adapta os dados para o formato esperado pelo backend
     const adaptedFormData = {
       departure_location: formData.departure_location,
       destination: formData.destination,
       start_date: formData.start_date,
       end_date: formData.end_date,
-      travelers_count: formData.travelers_count,
+      travelers_count: formData.travelers_count || 1,
       trip_type: formData.trip_type,
       budget_range: formData.budget_range,
       accommodation_preference: formData.accommodation_preference,
@@ -357,6 +355,7 @@ export default function DynamicForm() {
       {/* Indicador de dados pré-selecionados */}
       {location.state && (
         <div className="max-w-xl mx-auto mt-8 mb-4">
+          
           <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
             <p className="text-sm text-green-800 dark:text-green-200 flex items-center justify-center">
               ✅ <strong className="ml-2">Formulário preenchido automaticamente</strong> 

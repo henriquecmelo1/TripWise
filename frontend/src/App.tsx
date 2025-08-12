@@ -3,7 +3,6 @@ import Navbar from "./components/NavBar";
 import Home from "./pages/Home";
 import Flights from "./pages/Flights";
 import ItineraryPage from "./pages/ItineraryPage";
-import Questionnaire from "./pages/Questionnaire";
 import TravelTips from "./pages/TravelTips";
 import ExploreDestinations from "./pages/ExploreDestinations";
 import MyTrips from "./pages/MyTrips";
@@ -21,15 +20,6 @@ function App() {
             <>
               <Navbar />
               <DynamicForm />
-            </>
-          }
-        />
-        <Route
-          path="/forms-old"
-          element={
-            <>
-              <Navbar />
-              <Questionnaire />
             </>
           }
         />

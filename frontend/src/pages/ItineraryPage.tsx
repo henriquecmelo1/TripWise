@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { type BackendItineraryResponse } from "../data/itineraryInterface";
 import {
   iconDiamond,
@@ -23,7 +22,7 @@ import ExperiencesGemsTipsSection from "../components/Itinerary/ExperiencesGemsT
 import BudgetSection from "../components/Itinerary/BudgetSection";
 import SpecialConsiderationsSection from "../components/Itinerary/SpecialConsiderationsSection";
 import ItineraryTimeline from "../components/Timeline/ItineraryTimeline";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Toast } from "../components/MicroInteractions";
 import { exportItineraryToPDF } from "../services/pdfExport";
 import {
@@ -36,6 +35,7 @@ export default function ItineraryPage() {
   const { addToFavorites, isFavorite } = useFavorites();
   const { addToHistory } = useItineraryHistory();
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"overview" | "timeline">(
     "overview"
   );
@@ -43,30 +43,25 @@ export default function ItineraryPage() {
     []
   );
   const [isExporting, setIsExporting] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error" | "warning" | "info";
+  } | null>(null);
 
   const itineraryData: BackendItineraryResponse = location.state?.itinerary;
 
-  // Early return if no data
-  if (!itineraryData) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
-          Nenhum itinerário encontrado
-        </h2>
-        <p className="text-gray-600 dark:text-gray-300">
-          Por favor, volte e preencha o formulário corretamente.
-        </p>
-      </div>
-    );
-  }
-
-  const itinerary = itineraryData.itinerary;
+  // Handle missing itinerary data gracefully
+  const itinerary = itineraryData?.itinerary;
 
   useEffect(() => {
     const loadDestinationPhotos = async () => {
+      if (!itineraryData?.tripDetails?.destination) return;
+
       try {
-        const photos = await searchDestinationPhotos(itineraryData.tripDetails.destination, 3);
+        const photos = await searchDestinationPhotos(
+          itineraryData.tripDetails.destination,
+          3
+        );
         setDestinationPhotos(photos);
       } catch (error) {
         console.error("Error loading destination photos:", error);
@@ -74,15 +69,26 @@ export default function ItineraryPage() {
     };
 
     loadDestinationPhotos();
-  }, [itineraryData.tripDetails.destination]);
+  }, [itineraryData?.tripDetails?.destination]);
+
+  const addedToHistoryRef = useRef<string | null>(null);
 
   useEffect(() => {
-    addToHistory({
-      title: `Roteiro para ${itineraryData.tripDetails.destination}`,
-      destination: itineraryData.tripDetails.destination,
-      duration: itineraryData.tripDetails.duration.toString(),
-      data: itineraryData,
-    });
+    if (!itineraryData?.tripDetails) return;
+
+    // Create a unique identifier for this itinerary to prevent duplicates
+    const itineraryId = `${itineraryData.tripDetails.destination}-${itineraryData.tripDetails.duration}-${JSON.stringify(itineraryData.tripDetails).slice(0, 100)}`;
+    
+    // Only add to history if we haven't already added this specific itinerary
+    if (addedToHistoryRef.current !== itineraryId) {
+      addToHistory({
+        title: `Roteiro para ${itineraryData.tripDetails.destination}`,
+        destination: itineraryData.tripDetails.destination,
+        duration: itineraryData.tripDetails.duration.toString(),
+        data: itineraryData,
+      });
+      addedToHistoryRef.current = itineraryId;
+    }
   }, [addToHistory, itineraryData]);
 
   const generateTimelineData = () => {
@@ -105,6 +111,14 @@ export default function ItineraryPage() {
   };
 
   const handleAddToFavorites = () => {
+    if (!itineraryData?.tripDetails) {
+      setToast({
+        message: "Nenhum itinerário para favoritar.",
+        type: "warning",
+      });
+      return;
+    }
+
     addToFavorites({
       title: `Roteiro para ${itineraryData.tripDetails.destination}`,
       destination: itineraryData.tripDetails.destination,
@@ -115,6 +129,13 @@ export default function ItineraryPage() {
 
   const handleExportPDF = async () => {
     if (isExporting) return;
+    if (!itineraryData?.tripDetails) {
+      setToast({
+        message: "Nenhum itinerário para exportar.",
+        type: "warning",
+      });
+      return;
+    }
 
     setIsExporting(true);
     try {
@@ -129,20 +150,31 @@ export default function ItineraryPage() {
       setToast({ message: "PDF gerado com sucesso!", type: "success" });
     } catch (error) {
       console.error("Erro ao exportar PDF:", error);
-      setToast({ message: "Erro ao gerar o PDF. Tente novamente.", type: "error" });
+      setToast({
+        message: "Erro ao gerar o PDF. Tente novamente.",
+        type: "error",
+      });
     } finally {
       setIsExporting(false);
     }
   };
 
   const timelineData = generateTimelineData();
-  const isAlreadyFavorite = isFavorite(
-    `Roteiro para ${itineraryData.tripDetails.destination}`,
-    itineraryData.tripDetails.destination
-  );
+  const isAlreadyFavorite = itineraryData?.tripDetails
+    ? isFavorite(
+        `Roteiro para ${itineraryData.tripDetails.destination}`,
+        itineraryData.tripDetails.destination
+      )
+    : false;
 
   return (
-    <>
+    <div
+      className={`w-full transition-colors duration-300 ${
+        isDarkMode
+          ? "dark bg-gray-900"
+          : "bg-gradient-to-br from-blue-50 via-white to-indigo-50"
+      }`}
+    >
       {toast && (
         <Toast
           message={toast.message}
@@ -150,13 +182,6 @@ export default function ItineraryPage() {
           onClose={() => setToast(null)}
         />
       )}
-      <div
-        className={`min-h-screen w-full transition-colors duration-300 ${
-          isDarkMode
-            ? "dark bg-gray-900"
-            : "bg-gradient-to-br from-blue-50 via-white to-indigo-50"
-      }`}
-    >
       <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
@@ -296,75 +321,100 @@ export default function ItineraryPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === "overview" && (
-          <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 my-8 transition-colors duration-300">
-            <ItineraryHeader itinerary={itinerary} />
-
-            <DailyItinerarySection
-              itinerarioDiario={itinerary.itinerarioDiario}
-              iconCalendar={iconCalendar}
-              iconActivity={iconActivity}
-              iconMeals={iconMeals}
-              iconHotel={iconHotel}
-              iconBriefcase={iconBriefcase}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-gray-200 dark:border-gray-700 pt-8 mt-8">
-              <div className="space-y-6">
-                <RecommendationsSection
-                  recommendations={itinerary.recomendacoesHospedagem}
-                  iconHotel={iconHotel}
-                />
-                <ExperiencesGemsTipsSection
-                  experienciasUnicas={itinerary.experienciasUnicas}
-                  joiasEscondidas={itinerary.joiasEscondidas}
-                  dicasEspecialistas={itinerary.dicasEspecialistas}
-                  iconStar={iconStar}
-                  iconDiamond={iconDiamond}
-                  iconLightbulb={iconLightbulb}
-                />
-              </div>
-              <div className="space-y-6">
-                <BudgetSection
-                  budget={itinerary.orcamentoDetalhado}
-                  iconDollarSign={iconDollarSign}
-                />
-                <SpecialConsiderationsSection
-                  considerations={itinerary.consideracoesEspeciais}
-                  iconLightbulb={iconLightbulb}
-                />
+        {activeTab === "overview" &&
+          (!itinerary ? (
+            <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 my-8 text-center">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                Nenhum itinerário encontrado
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                Gere um novo roteiro ou abra um existente para visualizar os
+                detalhes.
+              </p>
+              <div className="flex justify-center gap-3">
+                <button
+                  onClick={() => navigate("/forms")}
+                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                >
+                  Gerar Roteiro
+                </button>
+                <button
+                  onClick={() => navigate("/my-trips")}
+                  className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 transition-colors"
+                >
+                  Minhas Viagens
+                </button>
               </div>
             </div>
+          ) : (
+            <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 my-8 transition-colors duration-300">
+              <ItineraryHeader itinerary={itinerary} />
 
-            {/* Destination Photos */}
-            {destinationPhotos.length > 0 && (
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-8 mt-8">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                  Fotos dos Destinos
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {destinationPhotos.map((photo, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={photo.urls.small}
-                        alt={photo.alt_description || "Destino"}
-                        className="w-full h-48 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 rounded-lg flex items-end">
-                        <div className="p-3 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <p className="text-sm font-medium">
-                            {photo.alt_description}
-                          </p>
-                          <p className="text-xs">Por {photo.user.name}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+              <DailyItinerarySection
+                itinerarioDiario={itinerary.itinerarioDiario}
+                iconCalendar={iconCalendar}
+                iconActivity={iconActivity}
+                iconMeals={iconMeals}
+                iconHotel={iconHotel}
+                iconBriefcase={iconBriefcase}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-gray-200 dark:border-gray-700 pt-8 mt-8">
+                <div className="space-y-6">
+                  <RecommendationsSection
+                    recommendations={itinerary.recomendacoesHospedagem}
+                    iconHotel={iconHotel}
+                  />
+                  <ExperiencesGemsTipsSection
+                    experienciasUnicas={itinerary.experienciasUnicas}
+                    joiasEscondidas={itinerary.joiasEscondidas}
+                    dicasEspecialistas={itinerary.dicasEspecialistas}
+                    iconStar={iconStar}
+                    iconDiamond={iconDiamond}
+                    iconLightbulb={iconLightbulb}
+                  />
+                </div>
+                <div className="space-y-6">
+                  <BudgetSection
+                    budget={itinerary.orcamentoDetalhado}
+                    iconDollarSign={iconDollarSign}
+                  />
+                  <SpecialConsiderationsSection
+                    considerations={itinerary.consideracoesEspeciais}
+                    iconLightbulb={iconLightbulb}
+                  />
                 </div>
               </div>
-            )}
-          </div>
-        )}
+
+              {/* Destination Photos */}
+              {destinationPhotos.length > 0 && (
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-8 mt-8">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                    Fotos dos Destinos
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {destinationPhotos.map((photo, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={photo.urls.small}
+                          alt={photo.alt_description || "Destino"}
+                          className="w-full h-48 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 rounded-lg flex items-end">
+                          <div className="p-3 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <p className="text-sm font-medium">
+                              {photo.alt_description}
+                            </p>
+                            <p className="text-xs">Por {photo.user.name}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
 
         {activeTab === "timeline" && (
           <div className="space-y-6">
@@ -381,7 +431,6 @@ export default function ItineraryPage() {
           </div>
         )}
       </main>
-      </div>
-    </>
+    </div>
   );
 }

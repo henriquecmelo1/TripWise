@@ -6,9 +6,6 @@ import {
   iconCalendar,
   iconDollarSign,
 } from "../assets/icons";
-// BRAVE enrichment agora está integrado diretamente aos itinerários
-// Funcionalidade de "Info Inteligente" removida - dados contextuais 
-// são automaticamente incluídos durante a geração de itinerários
 
 interface Destination {
   id: string;

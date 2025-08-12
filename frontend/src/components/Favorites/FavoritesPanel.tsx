@@ -46,7 +46,7 @@ const FavoritesPanel: React.FC<FavoritesPanelProps> = ({ className = '' }) => {
           Adicione itinerários aos seus favoritos para acessá-los rapidamente
         </p>
         <button
-          onClick={() => navigate('/questionnaire')}
+          onClick={() => navigate('/forms')}
           className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
         >
           Criar Novo Itinerário

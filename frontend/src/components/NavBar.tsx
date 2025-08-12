@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { iconMapMarkerAlt, iconCalendar, iconStar } from "../assets/icons";
 import { type Flight } from "../data/flightInterface";
 import logo from "../assets/logo.svg";
@@ -77,9 +77,10 @@ export default function Navbar() {
           {/* Navigation Links */}
           <div className="flex flex-wrap justify-center md:justify-end space-x-2 md:space-x-4">
             {navItems.map((item) => (
-              <button
+              <Link
                 key={item.path}
-                onClick={() => handleNavigation(item.path)}
+                to={item.path}
+                state={{ departureFlights, returnFlights, itinerary }}
                 className={`group relative px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 ${
                   isActive(item.path)
                     ? `bg-gradient-to-r ${item.gradient} text-white shadow-lg`
@@ -100,7 +101,7 @@ export default function Navbar() {
                 {isActive(item.path) && (
                   <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white rounded-full animate-pulse" />
                 )}
-              </button>
+              </Link>
             ))}
           </div>
         </div>
