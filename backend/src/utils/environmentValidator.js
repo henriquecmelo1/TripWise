@@ -12,6 +12,20 @@ class EnvironmentValidator {
         required: true,
         validator: (value) => value && value.length > 10,
       },
+      {
+        name: "UNSPLASH_ACCESS_KEY",
+        description: "Chave de acesso Unsplash (obrigatória)",
+        required: true,
+        validator: (value) => value && value.length > 10,
+      },
+      {
+        name: "UNSPLASH_SECRET_KEY",
+        description: "Chave secreta Unsplash (obrigatória)",
+        required: true,
+        validator: (value) => value && value.length > 10,
+      },
+
+
     ];
 
     this.optionalVars = [
@@ -33,6 +47,12 @@ class EnvironmentValidator {
         service: "exchange",
         validator: (value) => !value || value.length > 10,
       },
+      {
+        name: 'BRAVE_API_KEY',
+        description: 'Chave da API Brave (opcional)',
+        service: 'places',
+        validator: (value) => !value || value.length > 10,
+      }
     ];
 
     this.environmentConfig = {
@@ -272,9 +292,6 @@ LOG_LEVEL=info
     return exampleContent;
   }
 
-  /**
-   * Verifica se o sistema pode iniciar
-   */
   canStart() {
     const results = this.validateEnvironment();
     const canStart = this.printValidationReport(results);
@@ -287,35 +304,6 @@ LOG_LEVEL=info
     }
 
     return canStart;
-  }
-
-  /**
-   * Monitora mudanças nas variáveis de ambiente (para desenvolvimento)
-   */
-  watchEnvironment(callback) {
-    if (this.environmentConfig.NODE_ENV !== "development") {
-      return;
-    }
-
-    // Monitora mudanças a cada 30 segundos em desenvolvimento
-    const interval = setInterval(() => {
-      const currentResults = this.validateEnvironment();
-      const currentConfig = JSON.stringify(currentResults.config);
-      const storedConfig = JSON.stringify(this.environmentConfig);
-
-      if (currentConfig !== storedConfig) {
-        logger.info("Mudanças no ambiente detectadas", {
-          oldConfig: this.environmentConfig,
-          newConfig: currentResults.config
-        });
-        
-        if (callback) {
-          callback(currentResults);
-        }
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
   }
 }
 

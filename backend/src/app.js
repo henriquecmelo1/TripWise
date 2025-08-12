@@ -134,9 +134,4 @@ app.listen(PORT, () => {
   console.log(`   • GET /api/ai/health - Health check`);
   console.log(`   • GET / - Status do sistema\n`);
 
-  if (statusReport.environment === "development") {
-    envValidator.watchEnvironment((newResults) => {
-      logger.info("Configuração de ambiente atualizada", { newResults });
-    });
-  }
 });
