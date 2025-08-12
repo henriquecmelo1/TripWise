@@ -25,10 +25,6 @@ import ItineraryTimeline from "../components/Timeline/ItineraryTimeline";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Toast } from "../components/MicroInteractions";
 import { exportItineraryToPDF } from "../services/pdfExport";
-import {
-  searchDestinationPhotos,
-  type UnsplashPhoto,
-} from "../services/unsplash";
 
 export default function ItineraryPage() {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -38,9 +34,6 @@ export default function ItineraryPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"overview" | "timeline">(
     "overview"
-  );
-  const [destinationPhotos, setDestinationPhotos] = useState<UnsplashPhoto[]>(
-    []
   );
   const [isExporting, setIsExporting] = useState(false);
   const [toast, setToast] = useState<{
@@ -53,23 +46,23 @@ export default function ItineraryPage() {
   // Handle missing itinerary data gracefully
   const itinerary = itineraryData?.itinerary;
 
-  useEffect(() => {
-    const loadDestinationPhotos = async () => {
-      if (!itineraryData?.tripDetails?.destination) return;
+  // useEffect(() => {
+  //   const loadDestinationPhotos = async () => {
+  //     if (!itineraryData?.tripDetails?.destination) return;
 
-      try {
-        const photos = await searchDestinationPhotos(
-          itineraryData.tripDetails.destination,
-          3
-        );
-        setDestinationPhotos(photos);
-      } catch (error) {
-        console.error("Error loading destination photos:", error);
-      }
-    };
+  //     try {
+  //       const photos = await searchDestinationPhotos(
+  //         itineraryData.tripDetails.destination,
+  //         3
+  //       );
+  //       setDestinationPhotos(photos);
+  //     } catch (error) {
+  //       console.error("Error loading destination photos:", error);
+  //     }
+  //   };
 
-    loadDestinationPhotos();
-  }, [itineraryData?.tripDetails?.destination]);
+  //   loadDestinationPhotos();
+  // }, [itineraryData?.tripDetails?.destination]);
 
   const addedToHistoryRef = useRef<string | null>(null);
 
@@ -418,7 +411,7 @@ export default function ItineraryPage() {
               </div>
 
               {/* Destination Photos */}
-              {destinationPhotos.length > 0 && (
+              {/* {destinationPhotos.length > 0 && (
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-8 mt-8">
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                     Fotos dos Destinos
@@ -443,7 +436,7 @@ export default function ItineraryPage() {
                     ))}
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
           ))}
 

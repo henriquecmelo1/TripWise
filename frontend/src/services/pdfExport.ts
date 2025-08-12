@@ -13,6 +13,7 @@ export const exportItineraryToPDF = async (
   itineraryData: BackendItineraryResponse,
   options: ExportOptions = {}
 ): Promise<void> => {
+  console.log(itineraryData)
   const destination = itineraryData?.tripDetails?.destination || "viagem";
   const safeDestination =
     destination
@@ -369,11 +370,11 @@ const generateExperiencesHTML = (experiences: any[]): string => {
         .map(
           (exp) => `
         <div style="margin-bottom: 12px; background-color: #FAF5FF; padding: 12px; border-radius: 6px; border: 1px solid #E9D5FF;">
-          <p style="margin: 0; font-weight: bold; color: #6B21A8;">${
-            exp.nome || exp.experiencia || exp.titulo || "Experiência"
+          <p style="margin: 0; color: #6B21A8; font-size: 12px; line-height: 1.5;">${
+            typeof exp === 'string' ? exp : (exp.nome || exp.experiencia || exp.titulo || "Experiência")
           }</p>
           ${
-            exp.descricao
+            typeof exp === 'object' && exp.descricao
               ? `<p style="margin: 6px 0 0 0; color: #7C3AED; font-size: 11px;">${exp.descricao}</p>`
               : ""
           }
@@ -397,11 +398,11 @@ const generateHiddenGemsHTML = (gems: any[]): string => {
         .map(
           (gem) => `
         <div style="margin-bottom: 12px; background-color: #ECFEFF; padding: 12px; border-radius: 6px; border: 1px solid #A5F3FC;">
-          <p style="margin: 0; font-weight: bold; color: #0E7490;">${
-            gem.nome || gem.local || gem.titulo || "Local"
+          <p style="margin: 0; color: #0E7490; font-size: 12px; line-height: 1.5;">${
+            typeof gem === 'string' ? gem : (gem.nome || gem.local || gem.titulo || "Local")
           }</p>
           ${
-            gem.descricao
+            typeof gem === 'object' && gem.descricao
               ? `<p style="margin: 6px 0 0 0; color: #0891B2; font-size: 11px;">${gem.descricao}</p>`
               : ""
           }
