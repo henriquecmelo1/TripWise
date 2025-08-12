@@ -2,6 +2,7 @@ export const API_BASE_URLS = {
   OPENWEATHER: "https://api.openweathermap.org/data/2.5",
   FOURSQUARE: "https://places-api.foursquare.com",
   EXCHANGE_RATE: "https://v6.exchangerate-api.com/v6",
+  BRAVE_SEARCH: "https://api.search.brave.com/res/v1",
 };
 
 export const FOURSQUARE_CATEGORIES = {
@@ -17,6 +18,8 @@ export const API_LIMITS = {
   HOTEL_RESULTS_LIMIT: 8,
   MIN_RESTAURANT_RATING: 4.0,
   MIN_HOTEL_RATING: 3.5,
+  BRAVE_SEARCH_LIMIT: 10,
+  BRAVE_RATE_LIMIT_MS: 1000, // 1 request per second
 };
 
 export const API_VERSIONS = {

@@ -1,12 +1,14 @@
 import "dotenv/config";
 import { GoogleGenAI } from "@google/genai";
 import ExternalAPIsService from "../services/externalAPIs.js";
+import BraveAPIService from "../services/braveAPIService.js";
 
 class AIEngine {
   constructor() {
     this.genAI = new GoogleGenAI({});
     this.model = "gemini-2.5-flash";
     this.externalAPIs = new ExternalAPIsService();
+    this.braveAPI = new BraveAPIService();
   }
 
   /**
@@ -115,6 +117,18 @@ ${Object.entries(enrichedData.exchange.rates)
 - Última atualização: ${enrichedData.exchange.lastUpdate}`
       : "";
 
+    const currentEventsInfo = enrichedData?.search
+      ? `
+EVENTOS E INFORMAÇÕES ATUAIS (Brave Search):
+Total de items: ${enrichedData.search.total}
+${enrichedData.search.enrichment
+  ?.map(
+    (item) =>
+      `- [${item.type.toUpperCase()}] ${item.title}\n  ${item.description}\n  Fonte: ${item.source}\n  Link: ${item.url}`
+  )
+  .join("\n\n")}`
+      : "";
+
     const transportInfo = enrichedData?.transport
       ? `
 TRANSPORTE LOCAL DISPONÍVEL:
@@ -165,6 +179,7 @@ ${hotelInfo}
 ${exchangeInfo}
 ${transportInfo}
 ${eventsInfo}
+${currentEventsInfo}
 
 DIRETRIZES PARA CRIAÇÃO (AGORA COM DADOS REAIS):
 1. Crie uma NARRATIVA TEMÁTICA coerente, não apenas uma lista
@@ -182,12 +197,13 @@ DIRETRIZES PARA CRIAÇÃO (AGORA COM DADOS REAIS):
 7. CONSIDERE AS CONDIÇÕES METEOROLÓGICAS para sugerir atividades apropriadas
 8. INCLUA OS PREÇOS EM MOEDA LOCAL usando as taxas de câmbio atuais
 9. OTIMIZE o transporte usando as opções locais disponíveis e preferências do usuário
-10. MENCIONE os eventos locais quando relevantes
-11. Inclua "joias escondidas" e experiências autênticas locais
-12. Sugira alternativas para diferentes cenários (chuva, lotação, etc.)
-13. Inclua dicas práticas e contexto cultural
-14. Personalize cada recomendação ao perfil específico
-15. **Para cada restaurante sugerido, confirme que atende às restrições alimentares**
+10. **INCORPORE EVENTOS E NOTÍCIAS ATUAIS** da Brave Search nas recomendações quando relevantes
+11. **ALERTE SOBRE POSSÍVEIS PROBLEMAS** encontrados nas notícias (greves, fechamentos, eventos que podem afetar o turismo)
+12. Inclua "joias escondidas" e experiências autênticas locais
+13. Sugira alternativas para diferentes cenários (chuva, lotação, etc.)
+14. Inclua dicas práticas e contexto cultural
+15. Personalize cada recomendação ao perfil específico
+16. **Para cada restaurante sugerido, confirme que atende às restrições alimentares**
 
 FORMATO DE RESPOSTA (JSON):
 {
@@ -228,6 +244,15 @@ FORMATO DE RESPOSTA (JSON):
     },
     "experienciasUnicas": ["Experiência 1", "Experiência 2"],
     "joiasEscondidas": ["Local secreto 1", "Local secreto 2"],
+    "eventosAtuais": [
+        {
+            "evento": "Nome do evento atual",
+            "data": "Data do evento",
+            "relevancia": "Por que é relevante para esta viagem",
+            "fonte": "Link da notícia"
+        }
+    ],
+    "alertasImportantes": ["Alerta sobre greves, fechamentos, etc."],
     "dicasEspecialistas": ["Dica 1", "Dica 2"],
     "orcamentoDetalhado": {
         "transporte": "Valor em moeda local (BRL)",
@@ -355,6 +380,7 @@ Retorne o itinerário otimizado no mesmo formato JSON, destacando as mudanças f
       events: null,
       exchange: null,
       transport: null,
+      search: null, // Brave Search results
       sources: [],
     };
 
@@ -427,6 +453,25 @@ Retorne o itinerário otimizado no mesmo formato JSON, destacando as mudanças f
               return data;
             })
             .catch((err) => console.log("Exchange API falhou:", err.message))
+        );
+      }
+
+      // 🔍 Brave Search - Current events and news  
+      if (this.braveAPI.apiKey) {
+        dataCollectionPromises.push(
+          this.braveAPI
+            .getContextualEnrichment(tripDetails.destination, {
+              startDate: tripDetails.startDate,
+              endDate: tripDetails.endDate
+            })
+            .then((data) => {
+              if (data.success) {
+                collectedData.search = data;
+                collectedData.sources.push("Brave Search");
+              }
+              return data;
+            })
+            .catch((err) => console.log("Brave Search API falhou:", err.message))
         );
       }
 

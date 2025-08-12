@@ -49,8 +49,8 @@ class EnvironmentValidator {
       },
       {
         name: 'BRAVE_API_KEY',
-        description: 'Chave da API Brave (opcional)',
-        service: 'places',
+        description: 'Chave da API Brave Search (opcional)',
+        service: 'search',
         validator: (value) => !value || value.length > 10,
       }
     ];
@@ -183,6 +183,7 @@ class EnvironmentValidator {
         weather: validationResults.availableServices.includes("weather"),
         places: validationResults.availableServices.includes("places"),
         exchange: validationResults.availableServices.includes("exchange"),
+        search: validationResults.availableServices.includes("search"),
       },
       summary: {
         totalErrors: validationResults.errors.length,
@@ -279,6 +280,10 @@ FOURSQUARE_API_KEY=sua_chave_aqui
 # APIs de Câmbio
 EXCHANGE_RATE_API_KEY=sua_chave_aqui
 # Gratuita: https://exchangerate-api.com/
+
+# APIs de Busca
+BRAVE_API_KEY=sua_chave_aqui
+# Paga: https://api.search.brave.com/
 
 # ===========================================
 # CONFIGURAÇÕES DO SERVIDOR
