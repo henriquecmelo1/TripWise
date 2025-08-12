@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { buildApiUrl, API_CONFIG } from "../constants/api";
-import LoadingSpinner from "../components/LoadingSpinner";
 
 interface GeneratingState {
   agendarVoo?: boolean;
@@ -110,10 +109,6 @@ export default function Generating() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Gerando seu roteiro personalizado</h1>
           <p className="mt-2 text-gray-600 dark:text-gray-300">Estamos preparando recomendações únicas, experiências autênticas e um plano sob medida para sua viagem.</p>
-
-          <div className="mt-6">
-            <LoadingSpinner text="Isso pode levar alguns segundos..." />
-          </div>
 
           {error && (
             <div className="mt-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800">

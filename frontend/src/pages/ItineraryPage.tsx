@@ -110,6 +110,7 @@ export default function ItineraryPage() {
     }));
   };
 
+
   const handleAddToFavorites = () => {
     if (!itineraryData?.tripDetails) {
       setToast({
@@ -195,11 +196,13 @@ export default function ItineraryPage() {
             </div>
 
             <div className="flex items-center space-x-3">
+              {/* PDF como ação principal; demais em menu no mobile */}
               <button
                 onClick={handleExportPDF}
                 disabled={isExporting}
                 className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded-lg transition-all duration-300 transform hover:scale-105 disabled:scale-100"
                 title="Exportar para PDF"
+                aria-label="Exportar roteiro para PDF"
               >
                 {isExporting ? (
                   <svg
@@ -235,57 +238,80 @@ export default function ItineraryPage() {
                 </span>
               </button>
 
-              {/* Add to Favorites Button */}
-              <button
-                onClick={handleAddToFavorites}
-                disabled={isAlreadyFavorite}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:scale-100 ${
-                  isAlreadyFavorite
-                    ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 cursor-not-allowed"
-                    : "bg-yellow-500 hover:bg-yellow-600 text-white"
-                }`}
-                title={
-                  isAlreadyFavorite
-                    ? "Já está nos favoritos"
-                    : "Adicionar aos favoritos"
-                }
-              >
-                <span className="text-lg">
-                  {isAlreadyFavorite ? "⭐" : "☆"}
-                </span>
-                <span className="hidden sm:inline">
-                  {isAlreadyFavorite ? "Favoritado" : "Favoritar"}
-                </span>
-              </button>
+              <div className="relative sm:hidden">
+                <details>
+                  <summary className="list-none cursor-pointer px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100">Ações</summary>
+                  <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-10 py-2">
+                    <button
+                      onClick={handleAddToFavorites}
+                      disabled={isAlreadyFavorite}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-60"
+                    >
+                      {isAlreadyFavorite ? "Favoritado" : "Favoritar"}
+                    </button>
+                    <button
+                      onClick={toggleTheme}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700"
+                    >
+                      Alternar tema
+                    </button>
+                  </div>
+                </details>
+              </div>
 
-              {/* Theme Toggle Button */}
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 transform hover:scale-105"
-                aria-label="Alternar modo escuro"
-              >
-                {isDarkMode ? (
-                  <svg
-                    className="w-5 h-5 text-yellow-500 pointer-events-none"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-5 h-5 text-gray-700 pointer-events-none"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-                  </svg>
-                )}
-              </button>
+              {/* Desktop: botões visíveis */}
+              <div className="hidden sm:flex items-center space-x-3">
+                <button
+                  onClick={handleAddToFavorites}
+                  disabled={isAlreadyFavorite}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:scale-100 ${
+                    isAlreadyFavorite
+                      ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 cursor-not-allowed"
+                      : "bg-yellow-500 hover:bg-yellow-600 text-white"
+                  }`}
+                  title={
+                    isAlreadyFavorite
+                      ? "Já está nos favoritos"
+                      : "Adicionar aos favoritos"
+                  }
+                  aria-label="Adicionar roteiro aos favoritos"
+                >
+                  <span className="text-lg">
+                    {isAlreadyFavorite ? "⭐" : "☆"}
+                  </span>
+                  <span className="hidden sm:inline">
+                    {isAlreadyFavorite ? "Favoritado" : "Favoritar"}
+                  </span>
+                </button>
+
+                <button
+                  onClick={toggleTheme}
+                  className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 transform hover:scale-105"
+                  aria-label="Alternar modo escuro"
+                >
+                  {isDarkMode ? (
+                    <svg
+                      className="w-5 h-5 text-yellow-500 pointer-events-none"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-5 h-5 text-gray-700 pointer-events-none"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -294,7 +320,7 @@ export default function ItineraryPage() {
       {/* Tab Navigation */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
         <div className="border-b border-gray-200 dark:border-gray-700">
-          <nav className="-mb-px flex space-x-8">
+          <nav className="-mb-px flex space-x-8 overflow-x-auto">
             <button
               onClick={() => setActiveTab("overview")}
               className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
@@ -348,7 +374,12 @@ export default function ItineraryPage() {
             </div>
           ) : (
             <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 my-8 transition-colors duration-300">
-              <ItineraryHeader itinerary={itinerary} />
+              <ItineraryHeader
+                itinerary={itinerary}
+                onViewTimeline={() => setActiveTab("timeline")}
+                destination={itineraryData?.tripDetails?.destination}
+                duration={itineraryData?.tripDetails?.duration?.toString()}
+              />
 
               <DailyItinerarySection
                 itinerarioDiario={itinerary.itinerarioDiario}
