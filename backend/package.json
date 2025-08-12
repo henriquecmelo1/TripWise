@@ -13,12 +13,13 @@
   "dependencies": {
     "@google/genai": "^1.7.0",
     "amadeus": "^11.0.0",
+    "axios": "^1.6.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "luxon": "^3.6.1",
     "pdfkit": "^0.15.0",
-    "axios": "^1.6.0"
+    "unsplash-js": "^7.0.19"
   },
   "type": "module"
 }

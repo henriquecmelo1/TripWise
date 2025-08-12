@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { getFlights } from "./flights/flights.js";
 import aiRoutes from "./routes/ai.routes.js";
+import externalRoutes from "./routes/external.routes.js";
 
 const app = express();
 const PORT = 3000;
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 app.post("/flights/search", getFlights);
 
 app.use("/api/ai", aiRoutes);
+app.use("/api/external", externalRoutes);
 
 app.get("/", (req, res) => {
   res.json({
@@ -34,10 +36,13 @@ app.get("/", (req, res) => {
       "Perfil de Usuário": "/api/ai/profile/create",
       "Recomendações Contextuais": "/api/ai/recommendations/contextual",
       "Busca de Voos": "/flights/search",
+      "Fotos de Destinos": "/api/external/photos",
     },
     documentation: {
       "Questionário de Integração": "/api/ai/onboarding/questions",
       "Health Check da IA": "/api/ai/health",
+      "Status APIs Externas": "/api/external/health",
+      "Status Unsplash": "/api/external/photos/status",
     },
     version: "1.0.0",
     timestamp: new Date().toISOString(),

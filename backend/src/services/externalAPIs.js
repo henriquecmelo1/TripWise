@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { createApi } from 'unsplash-js';
 import {
   API_BASE_URLS,
   FOURSQUARE_CATEGORIES,
@@ -24,7 +25,15 @@ class ExternalAPIsService {
       exchange: {
         exchangeRate: process.env.EXCHANGE_RATE_API_KEY,
       },
+      photos: {
+        unsplash: process.env.UNSPLASH_ACCESS_KEY,
+      },
     };
+
+    // Initialize Unsplash API
+    this.unsplash = createApi({
+      accessKey: process.env.UNSPLASH_ACCESS_KEY,
+    });
   }
 
   async getWeatherData(destination, dates) {
@@ -408,6 +417,88 @@ class ExternalAPIsService {
     if (categoryNames.includes("hostel")) return HOTEL_TYPES.HOSTEL;
 
     return HOTEL_TYPES.STANDARD;
+  }
+
+  /**
+   * Get destination photos from Unsplash
+   * @param {string} destination - Destination name
+   * @param {number} count - Number of photos to fetch (default: 3)
+   * @param {string} query - Custom search query (optional)
+   * @returns {Object} Photos data or error
+   */
+  async getDestinationPhotos(destination, count = 3, query = null) {
+    try {
+      if (!this.apis.photos.unsplash) {
+        return {
+          success: false,
+          error: "Unsplash API key not configured",
+          photos: [],
+        };
+      }
+
+      const searchQuery = query || `${destination} travel destination`;
+      
+      const result = await this.unsplash.search.getPhotos({
+        query: searchQuery,
+        page: 1,
+        perPage: Math.min(count, 10), // Limit to max 10 photos
+        orientation: 'landscape',
+        contentFilter: 'high', // Get high quality photos
+      });
+
+      console.log('result')
+
+      if (result.type === 'success') {
+        const photos = result.response.results.map(photo => ({
+          id: photo.id,
+          urls: {
+            small: photo.urls.small,
+            regular: photo.urls.regular,
+            full: photo.urls.full,
+          },
+          alt_description: photo.alt_description || `Photo of ${destination}`,
+          user: {
+            name: photo.user.name,
+            username: photo.user.username,
+          },
+          links: {
+            download: photo.links.download_location,
+            html: photo.links.html,
+          },
+        }));
+
+        return {
+          success: true,
+          photos,
+          total: result.response.total,
+          source: "Unsplash",
+          query: searchQuery,
+        };
+      } else {
+        return {
+          success: false,
+          error: "Failed to fetch photos from Unsplash",
+          details: result.errors,
+          photos: [],
+        };
+      }
+    } catch (error) {
+      console.error("Error fetching Unsplash photos:", error);
+      return {
+        success: false,
+        error: "Error fetching destination photos",
+        details: error.message,
+        photos: [],
+      };
+    }
+  }
+
+  /**
+   * Check if Unsplash API is available
+   * @returns {boolean} True if API key is configured
+   */
+  isUnsplashAvailable() {
+    return !!this.apis.photos.unsplash;
   }
 }
 
