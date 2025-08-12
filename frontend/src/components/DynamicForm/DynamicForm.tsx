@@ -18,6 +18,7 @@ import {
 } from '../../assets/icons';
 import { useNavigate } from 'react-router-dom';
 import ToggleSwitch from '../Questionnaire/ToggleSwitch';
+import { validateRequiredFields, getValidationErrors } from '../../schemas/itineraryValidation';
 // removed unused API constants after redirecting generation logic to loading page
 
 interface FormData {
@@ -46,6 +47,7 @@ export default function DynamicForm() {
   const [formData, setFormData] = useState<FormData>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [agendarVoo, setAgendarVoo] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -54,6 +56,15 @@ export default function DynamicForm() {
       ...prev,
       [fieldId]: value
     }));
+    
+    // Limpar erro de validação do campo quando o usuário começar a digitar
+    if (validationErrors[fieldId]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[fieldId];
+        return newErrors;
+      });
+    }
   };
 
   const calculateTravelersData = () => {
@@ -72,8 +83,21 @@ export default function DynamicForm() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     
-    setIsLoading(true);
+    // Limpar erros anteriores
     setError(null);
+    setValidationErrors({});
+
+    // Validar campos obrigatórios
+    const validationResult = validateRequiredFields(formData);
+    
+    if (!validationResult.success) {
+      const errors = validationResult.error ? getValidationErrors(validationResult.error) : {};
+      setValidationErrors(errors);
+      setError('Por favor, corrija os erros nos campos obrigatórios antes de continuar.');
+      return;
+    }
+    
+    setIsLoading(true);
 
     const adaptedFormData = {
       departure_location: formData.departure_location,
@@ -147,71 +171,102 @@ export default function DynamicForm() {
 
   const renderField = (field: any) => {
     const icon = iconMap[field.id] || iconStar;
+    const hasError = validationErrors[field.id];
     
     switch (field.type) {
       case 'text':
         return (
-          <InputText
-            key={field.id}
-            label={field.label}
-            placeholder={field.placeholder}
-            icon={icon}
-            value={formData[field.id] as string || ''}
-            onChange={(value) => handleFieldChange(field.id, value)}
-          />
+          <div key={field.id}>
+            <InputText
+              label={field.label}
+              placeholder={field.placeholder}
+              icon={icon}
+              value={formData[field.id] as string || ''}
+              onChange={(value) => handleFieldChange(field.id, value)}
+            />
+            {hasError && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {validationErrors[field.id]}
+              </p>
+            )}
+          </div>
         );
         
       case 'date':
         return (
-          <InputDate
-            key={field.id}
-            label={field.label}
-            icon={icon}
-            selectedDate={formData[field.id] as string || null}
-            onChange={(value) => handleFieldChange(field.id, value)}
-            placeholderText={field.placeholder || 'Selecione uma data'}
-            minDate={field.id === 'end_date' ? (formData.start_date as string) || new Date().toISOString().split("T")[0] : new Date().toISOString().split("T")[0]}
-          />
+          <div key={field.id}>
+            <InputDate
+              label={field.label}
+              icon={icon}
+              selectedDate={formData[field.id] as string || null}
+              onChange={(value) => handleFieldChange(field.id, value)}
+              placeholderText={field.placeholder || 'Selecione uma data'}
+              minDate={field.id === 'end_date' ? (formData.start_date as string) || new Date().toISOString().split("T")[0] : new Date().toISOString().split("T")[0]}
+            />
+            {hasError && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {validationErrors[field.id]}
+              </p>
+            )}
+          </div>
         );
         
       case 'number':
         return (
-          <InputNumber
-            key={field.id}
-            label={field.label}
-            icon={icon}
-            value={formData[field.id] as number || field.min || 0}
-            onChange={(value) => handleFieldChange(field.id, value)}
-            min={field.min}
-            max={field.max}
-            placeholder={field.placeholder}
-          />
+          <div key={field.id}>
+            <InputNumber
+              label={field.label}
+              icon={icon}
+              value={formData[field.id] as number || field.min || 0}
+              onChange={(value) => handleFieldChange(field.id, value)}
+              min={field.min}
+              max={field.max}
+              placeholder={field.placeholder}
+            />
+            {hasError && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {validationErrors[field.id]}
+              </p>
+            )}
+          </div>
         );
         
       case 'select':
         return (
-          <InputSelect
-            key={field.id}
-            label={field.label}
-            icon={icon}
-            placeholder={field.placeholder || 'Selecione uma opção'}
-            options={field.options || []}
-            value={formData[field.id] as string || ''}
-            onChange={(value) => handleFieldChange(field.id, value)}
-          />
+          <div key={field.id}>
+            <InputSelect
+              label={field.label}
+              icon={icon}
+              placeholder={field.placeholder || 'Selecione uma opção'}
+              options={field.options || []}
+              value={formData[field.id] as string || ''}
+              onChange={(value) => handleFieldChange(field.id, value)}
+            />
+            {hasError && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {validationErrors[field.id]}
+              </p>
+            )}
+          </div>
         );
         
       case 'multi_select':
         return (
-          <InputMultiSelect
-            key={field.id}
-            question={field.label}
-            icon={icon}
-            options={field.options || []}
-            selectedValues={formData[field.id] as string[] || []}
-            onChange={(value) => handleFieldChange(field.id, value)}
-            maxSelections={field.maxSelections}
-          />
+          <div key={field.id}>
+            <InputMultiSelect
+              question={field.label}
+              icon={icon}
+              options={field.options || []}
+              selectedValues={formData[field.id] as string[] || []}
+              onChange={(value) => handleFieldChange(field.id, value)}
+              maxSelections={field.maxSelections}
+            />
+            {hasError && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {validationErrors[field.id]}
+              </p>
+            )}
+          </div>
         );
         
       default:
@@ -322,7 +377,27 @@ export default function DynamicForm() {
 
           {error && (
             <div className="mt-4 p-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 rounded-md">
-              <p>{error}</p>
+              <p className="font-semibold mb-2">{error}</p>
+              {Object.keys(validationErrors).length > 0 && (
+                <div className="text-sm">
+                  <p className="mb-1">Campos com erro:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    {Object.entries(validationErrors).map(([field, message]) => {
+                      const fieldLabels: Record<string, string> = {
+                        departure_location: 'Local de partida',
+                        destination: 'Destino',
+                        start_date: 'Data de início',
+                        end_date: 'Data de fim'
+                      };
+                      return (
+                        <li key={field}>
+                          <strong>{fieldLabels[field] || field}:</strong> {message}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
         </form>

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { type BackendItineraryResponse } from "../data/itineraryInterface";

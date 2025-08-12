@@ -35,8 +35,7 @@ export default function Flights() {
 
   const handleConfirmSelection = () => {
     if (selectedIdaFlight && selectedVoltaFlight) {
-      console.log("Voo de Ida selecionado:", selectedIdaFlight);
-      console.log("Voo de Volta selecionado:", selectedVoltaFlight);
+
       alert("Voos selecionados! Redirecionando para o roteiro...");
 
       // Redireciona para a página de roteiro, passando os voos selecionados

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { buildApiUrl, API_CONFIG } from "../constants/api";
