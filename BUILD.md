@@ -83,43 +83,32 @@ cp .env.example .env
 # CONFIGURAÇÕES OBRIGATÓRIAS
 # ===========================================
 
-# Google Gemini AI (OBRIGATÓRIO)
-GOOGLE_GEMINI_API_KEY=sua_chave_aqui
-# Obtenha em: https://makersuite.google.com/app/apikey
+# Google Gemini AI
+GEMINI_API_KEY=sua_chave_google_ai_aqui
 
 # ===========================================
 # CONFIGURAÇÕES OPCIONAIS (APIs Externas)
 # ===========================================
 
-# APIs Meteorológicas
-OPENWEATHER_API_KEY=sua_chave_aqui
-# Gratuita: https://openweathermap.org/api
-# Limite: 1.000 chamadas/dia
+# API de Previsão do Tempo
+OPENWEATHER_API_KEY=sua_chave_openweather_aqui
 
-WEATHER_API_KEY=sua_chave_aqui
-# Gratuita: https://www.weatherapi.com/
-# Limite: 1M chamadas/mês
+# API de Locais
+FOURSQUARE_API_KEY=sua_chave_foursquare_aqui
 
-# APIs de Locais
-FOURSQUARE_API_KEY=sua_chave_aqui
-# Gratuita: https://developer.foursquare.com/
-# Limite: 50 chamadas/dia
+# API de Cotação de Moedas
+EXCHANGE_RATE_API_KEY=sua_chave_exchange_rate_aqui
 
-GOOGLE_PLACES_API_KEY=sua_chave_aqui
-# $200 crédito: https://developers.google.com/maps
-# Limite: ~40.000 chamadas/mês
+# APIs de Voos/Viagens da Amadeus
+AMADEUS_API_KEY=sua_chave_amadeus_aqui
+AMADEUS_API_SECRET=sua_chave_amadeus_secret_aqui
 
-# APIs de Mapas (nao implementado)
-MAPBOX_API_KEY=sua_chave_aqui
-# Gratuita: https://www.mapbox.com/
-# Limite: 50k carregamentos/mês
+# API de Busca (Pesquisa)
+BRAVE_API_KEY=sua_chave_brave_search_aqui
 
-# ===========================================
-# CONFIGURAÇÕES DO SERVIDOR
-# ===========================================
-
-PORT=3000
-NODE_ENV=development
+# APIs de Imagens
+UNSPLASH_ACCESS_KEY=sua_chave_unsplash_access_aqui
+UNSPLASH_SECRET_KEY=sua_chave_unsplash_secret_aqui
 ```
 
 ## 🚀 Build do Backend
@@ -181,17 +170,38 @@ curl http://localhost:3000/api/ai/health
 
 ## 🎨 Build do Frontend
 
-> **Nota**: O frontend está em desenvolvimento. Esta seção será atualizada quando estiver disponível.
-
-### Estrutura Planejada
+### 1. Instalação de Dependências
 
 ```bash
-# Quando disponível:
+# Navegue para o diretório do frontend
 cd frontend
+
+# Instale as dependências
 npm install
-npm run build
-npm start
 ```
+
+### 2. Iniciar a Aplicação
+
+```bash
+# Inicie o servidor de desenvolvimento
+npm run dev
+```
+
+### 3. Verificação da Instalação
+Após executar o comando npm run dev, o terminal deve exibir uma mensagem indicando que a aplicação está disponível.
+
+```bash
+# Exemplo de saída esperada:
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h to show help
+
+```
+
+**Acesse o frontend no seu navegador pela URL: `http://localhost:5173`**.
+
+
 
 ## 🔌 Configuração de APIs Externas
 
@@ -205,6 +215,17 @@ npm start
 4. **Adicione ao .env**: `GOOGLE_GEMINI_API_KEY=sua_chave_aqui`
 
 ### APIs Opcionais (Recomendadas)
+
+#### Amadeus for Developers
+```bash
+# 1. Acesse: https://developers.amadeus.com/register
+# 2. Crie uma conta e confirme seu e-mail.
+# 3. Crie um novo projeto e selecione as APIs que você precisa (ex: Flight Offers Search).
+# 4. Obtenha suas credenciais (Client ID e Client Secret).
+# 5. Adicione ao .env:
+AMADEUS_API_KEY=seu_client_id_aqui
+AMADEUS_API_SECRET=seu_client_secret_aqui
+```
 
 #### OpenWeatherMap
 
@@ -225,26 +246,37 @@ OPENWEATHER_API_KEY=sua_chave_aqui
 # 4. Adicione ao .env:
 FOURSQUARE_API_KEY=sua_chave_aqui
 ```
-
-### Teste das APIs
+#### ExchangeRate-API
 
 ```bash
-# Use o arquivo test_ai_system.http para testar
-# Ou teste manualmente:
-
-# Teste com dados reais (APIs configuradas)
-curl -X POST http://localhost:3000/api/ai/itinerary/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "formData": {
-      "destination": "Lisboa, Portugal",
-      "start_date": "2025-08-15",
-      "end_date": "2025-08-20",
-      "travelers_count": 2,
-      "trip_type": "cultural"
-    }
-  }'
+# 1. Registre-se em: https://www.exchangerate-api.com/
+# 2. Confirme seu email
+# 3. Obtenha sua API key
+# 4. Adicione ao .env:
+EXCHANGERATE_API_KEY=sua_chave_aqui
 ```
+#### Brave Search API
+
+```bash
+# 1. Acesse: https://brave.com/search/api/
+# 2. Registre-se e solicite acesso à API.
+# 3. Obtenha sua API key
+# 4. Adicione ao .env:
+BRAVE_API_KEY=sua_chave_aqui
+```
+#### Unsplash API
+
+```bash
+# 1. Acesse: https://unsplash.com/developers
+# 2. Crie uma conta e registre uma nova aplicação.
+# 3. Obtenha sua Access Key e sua Secret Key
+# 4. Adicione ao .env:
+UNSPLASH_ACCESS_KEY=sua_chave_aqui
+UNSPLASH_SECRET_KEY=sua_chave_aqui
+```
+
+### Verificação da Configuração
+Ao iniciar o servidor com `npm start`, o console deve exibir logs confirmando que as chaves de API foram carregadas corretamente.
 
 ## 🏃‍♂️ Execução Local
 
@@ -255,13 +287,9 @@ curl -X POST http://localhost:3000/api/ai/itinerary/generate \
 cd backend
 npm start
 
-# Terminal 2: Frontend (quando disponível)
+# Terminal 2: Frontend 
 cd frontend
-npm start
-
-# Terminal 3: Testes (opcional)
-cd backend
-# Use VS Code com REST Client para executar test_ai_system.http
+npm run dev
 ```
 
 ### Modo Produção Local
@@ -278,6 +306,7 @@ npm start
 
 ### Usando Docker (Opcional)
 
+#### Backend
 ```dockerfile
 # Dockerfile (exemplo)
 FROM node:20-alpine
@@ -300,144 +329,34 @@ docker build -t tripwise-backend .
 docker run -p 3000:3000 --env-file backend/.env tripwise-backend
 ```
 
-## 🧪 Testes
+#### Frontend
+```dockerfile
+# Dockerfile (exemplo)
+# Use uma imagem base leve do Node para instalar as dependências
+FROM node:20-alpine AS builder
 
-### Testes Manuais
+WORKDIR /app
 
-#### 1. Usando VS Code + REST Client
+COPY frontend/package*.json ./
+RUN npm ci
 
+COPY frontend/src ./src
+COPY frontend/public ./public
+RUN npm run build
+
+# Use uma imagem NGINX para servir a aplicação estática
+FROM nginx:alpine
+
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+```
 ```bash
-# 1. Instale a extensão "REST Client" no VS Code
-# 2. Abra o arquivo backend/test_ai_system.http
-# 3. Clique em "Send Request" acima de cada teste
-```
-
-#### 2. Usando curl
-
-```bash
-# Teste de health check
-curl http://localhost:3000/api/ai/health
-
-# Teste de geração de itinerário
-curl -X POST http://localhost:3000/api/ai/itinerary/generate \
-  -H "Content-Type: application/json" \
-  -d @backend/test_data/sample_request.json
-```
-
-#### 3. Usando Postman
-
-1. **Importe** a collection do Postman (se disponível)
-2. **Configure** as variáveis de ambiente
-3. **Execute** os testes sequencialmente
-
-### Testes Automatizados
-
-> **Nota**: Testes automatizados estão planejados para implementação futura.
-
-```bash
-# Quando disponível:
-npm test              # Testes unitários
-npm run test:integration  # Testes de integração
-npm run test:e2e      # Testes end-to-end
-```
-
-### Cenários de Teste
-
-#### Teste 1: Geração Básica de Itinerário
-
-```json
-{
-  "formData": {
-    "destination": "Paris, França",
-    "start_date": "2025-06-01",
-    "end_date": "2025-06-05",
-    "travelers_count": 2,
-    "trip_type": "romantico",
-    "budget_range": "moderado"
-  }
-}
-```
-
-#### Teste 2: Chat Conversacional
-
-```json
-{
-  "sessionId": "test-session-123",
-  "message": "Quero visitar o Japão por 10 dias em abril",
-  "userId": "test-user-456"
-}
-```
-
-## 🚀 Deploy
-
-### Deploy Local (Produção)
-
-```bash
-# 1. Configure variáveis de produção
-export NODE_ENV=production
-export PORT=3000
-
-# 2. Otimize dependências
-cd backend
-npm ci --only=production
-
-# 3. Execute
-npm start
-```
-
-### Deploy em Nuvem
-
-#### Vercel (Recomendado)
-
-```bash
-# 1. Instale Vercel CLI
-npm i -g vercel
-
-# 2. Configure o projeto
-vercel
-
-# 3. Configure variáveis de ambiente no dashboard
-# 4. Deploy
-vercel --prod
-```
-
-#### Heroku
-
-```bash
-# 1. Instale Heroku CLI
-# 2. Crie um app
-heroku create tripwise-api
-
-# 3. Configure variáveis
-heroku config:set GOOGLE_GEMINI_API_KEY=sua_chave
-
-# 4. Deploy
-git push heroku main
-```
-
-#### Railway
-
-```bash
-# 1. Conecte seu repositório GitHub
-# 2. Configure variáveis de ambiente
-# 3. Deploy automático via Git
-```
-
-### Configuração de Produção
-
-```env
-# Variáveis específicas de produção
-NODE_ENV=production
-PORT=3000
-
-# URLs de produção
-FRONTEND_URL=https://tripwise.com
-API_BASE_URL=https://api.tripwise.com
-
-# Configurações de segurança
-CORS_ORIGIN=https://tripwise.com
-RATE_LIMIT_WINDOW=15
-RATE_LIMIT_MAX=100
+# Build e execução
+docker build -t tripwise-frontend ./frontend
+docker run -p 5173:80 tripwise-frontend
 ```
 
 ## 🔧 Troubleshooting
@@ -533,26 +452,6 @@ git add .
 git commit -m "backup: configuração funcional"
 git push origin backup-branch
 ```
-
-## 📊 Métricas de Build
-
-### Tempos Esperados
-
-| Operação | Tempo Esperado |
-|----------|----------------|
-| npm install | 30-60 segundos |
-| Startup do servidor | 2-5 segundos |
-| Primeira requisição | 5-10 segundos |
-| Requisições subsequentes | 1-3 segundos |
-
-### Recursos Necessários
-
-| Recurso | Mínimo | Recomendado |
-|---------|--------|-------------|
-| RAM | 512MB | 1GB |
-| CPU | 1 core | 2 cores |
-| Disco | 100MB | 500MB |
-| Rede | 1Mbps | 10Mbps |
 
 ## 📞 Suporte
 
