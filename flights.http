@@ -2,9 +2,9 @@ POST http://localhost:3000/flights/search
 Content-Type: application/json
 
 {
-    "originCode": "REC",
-    "destinationCode": "SAO",
-    "dateOfDeparture": "2025-07-10",
+    "originCity": "Recife",
+    "destinationCity": "Salvador",
+    "dateOfDeparture": "2025-08-20",
     "currency": "BRL",
     "adults": 2,
     "children": 1,
